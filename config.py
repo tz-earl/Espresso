@@ -1,5 +1,4 @@
 import os
-import sys
 
 SECRET_KEY = os.urandom(32)
 
