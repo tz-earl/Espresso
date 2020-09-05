@@ -39,3 +39,11 @@ For people who like to use command line utilities, Postgres comes
 with `psql`. It is very handy for accessing and manipulating
 the Postgres databases with its commands as well as
 SQL statements.
+
+For connecting to the Postgres database, four environment variables need
+to be set:
+
+`ESPRESSO_DB_USER`  
+`ESPRESSO_DB_PASSWORD`  
+`ESPRESSO_DB_HOST`  
+`ESPRESSO_DB_DATABASE_NAME`
