@@ -5,6 +5,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask import jsonify
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -38,6 +39,27 @@ class Restaurant(db.Model):
 @app.route('/')
 def index():
     return 'Hello from espresso'
+
+@app.route('/restaurants')
+def restaurants():
+    try:
+        restaurants = Restaurant.query.all()
+    except Exception as ex:
+        print('Failed to retrieve list of restaurants for "/restaurants" endpoint')
+        print(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+            'message': 'List of restaurants could not be retrieved',
+            'error-string': str(ex)
+            }
+
+    else:
+        rest_list = []
+        for rest in restaurants:
+            rest_item = {'id':rest.id, 'name':rest.name, 'street':rest.street }
+            rest_list.append(rest_item)
+        ret_val = {'success': True, 'restaurants': rest_list}
+    finally:
+        return jsonify(ret_val)
 
 #----------------------------------------------------------------------------#
 # Launch.
