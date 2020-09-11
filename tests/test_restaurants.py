@@ -3,6 +3,8 @@ import json
 
 import unittest
 
+from espresso import db
+
 
 def set_environment_vars():
     """Set the env vars to have values for testing"""
@@ -38,9 +40,10 @@ class RestaurantsTestCases(unittest.TestCase):
         self.test_count = 0
         # DEBUGGING: print(f"Using database uri: {self.app.config['SQLALCHEMY_DATABASE_URI']}")
 
-    def test_restaurants(self):
-        # TO-DO. Add test fixture to create and populate restaurants table.
-        # In the meantime, am doing that manually.
+        db.drop_all()
+        db.create_all()
+
+    def test_no_restaurants(self):
         resp = self.test_client.get('/restaurants')
         self.assertEqual(resp.status_code, 200)
 
@@ -49,5 +52,4 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp_dict['success'], True)
         self.assertTrue('restaurants' in resp_dict)
         self.assertEqual(type(resp_dict['restaurants']), list)
-        # TO-DO. Add an assertion about the number of restaurants, something like
-        # self.assertEqual(len(resp_dict['restaurants'], expected_count)
+        self.assertEqual(len(resp_dict['restaurants']), 0)
