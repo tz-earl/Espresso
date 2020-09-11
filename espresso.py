@@ -43,7 +43,7 @@ def index():
 @app.route('/restaurants')
 def restaurants():
     try:
-        restaurants = Restaurant.query.all()
+        restaurants = Restaurant.query.filter_by().order_by(Restaurant.id)
     except Exception as ex:
         print('Failed to retrieve list of restaurants for "/restaurants" endpoint')
         print(f'Exception was thrown: {str(ex)}')

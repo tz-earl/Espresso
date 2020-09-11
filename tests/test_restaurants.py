@@ -52,3 +52,20 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertTrue('restaurants' in resp_dict)
         self.assertEqual(type(resp_dict['restaurants']), list)
         self.assertEqual(len(resp_dict['restaurants']), 0)
+
+    def test_two_restaurants(self):
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Italiano'
+        db.session.add(Restaurant(name=name_1))
+        name_2 = 'Restaurant Français'
+        db.session.add(Restaurant(name=name_2))
+        db.session.commit()
+
+        resp = self.test_client.get('/restaurants')
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(len(resp_dict['restaurants']), 2)
+        self.assertEqual(resp_dict['restaurants'][0]['name'], name_1)
+        self.assertEqual(resp_dict['restaurants'][1]['name'], name_2)
