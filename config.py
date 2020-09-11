@@ -20,6 +20,5 @@ except KeyError as ex:
     print(f"Please set {ex.args[0]} and restart the app")
 else:
     db_url = f"postgres+psycopg2://{db_user}:{db_password}@{db_host}/{db_database_name}"
-
-SQLALCHEMY_DATABASE_URI = db_url
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = db_url
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
