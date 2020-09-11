@@ -51,11 +51,14 @@ def restaurants():
             'message': 'List of restaurants could not be retrieved',
             'error-string': str(ex)
             }
-
     else:
         rest_list = []
         for rest in restaurants:
-            rest_item = {'id':rest.id, 'name':rest.name, 'street':rest.street }
+            rest_item = {'id':rest.id, 'name':rest.name, 'street':rest.street, 'suite':rest.suite,
+                         'city':rest.city, 'state':rest.state, 'zip_code':rest.zip_code,
+                         'phone_num':rest.phone_num, 'website':rest.website, 'email':rest.email,
+                         'date_established':rest.date_established
+                         }
             rest_list.append(rest_item)
         ret_val = {'success': True, 'restaurants': rest_list}
     finally:
