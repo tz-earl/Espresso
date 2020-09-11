@@ -3,8 +3,6 @@ import json
 
 import unittest
 
-from espresso import db
-
 
 def set_environment_vars():
     """Set the env vars to have values for testing"""
@@ -30,10 +28,11 @@ class RestaurantsTestCases(unittest.TestCase):
     def setUp(self):
         set_environment_vars()
 
-        # N.B. We must set the environment variables to test values
-        # _before_ importing the app, otherwise, those env vars will
+        # Careful! We must set the environment variables to test values
+        # _before_ importing the espresso app, otherwise, those env vars will
         # still have their normal values when instantiating the app.
         from espresso import app
+        from espresso import db
 
         self.app = app
         self.test_client = app.test_client()
