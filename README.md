@@ -47,3 +47,20 @@ to be set:
 `ESPRESSO_DB_PASSWORD`  
 `ESPRESSO_DB_HOST`  
 `ESPRESSO_DB_DATABASE_NAME`
+
+Automated tests have been created using the unittest module. Four environment
+variables for testing need to be set. During testing the values of these
+variables are used instead of the normal values as set above.
+
+`ESPRESSO_TEST_DB_USER`  
+`ESPRESSO_TEST_DB_PASSWORD`  
+`ESPRESSO_TEST_DB_HOST`  
+`ESPRESSO_TEST_DB_DATABASE_NAME`
+
+Here some examples of how to run the tests.
+
+`$ python3 -m unittest tests/test_restaurants.py`
+
+Or use nose2 to discover and run all the tests.
+
+`$ nose2 -v`
