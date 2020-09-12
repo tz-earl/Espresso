@@ -5,7 +5,9 @@ import unittest
 
 
 def set_environment_vars():
-    """Set the env vars to have values for testing"""
+    """Set the env vars to have values for testing,
+    in particular for the test database
+    """
 
     # Note that this testing apparently runs in its own environment,
     # so there is no need to save and restore env variables.
@@ -24,8 +26,11 @@ def set_environment_vars():
 
 
 class RestaurantsTestCases(unittest.TestCase):
+    """Test cases for endpoints related to restaurants"""
 
     def setUp(self):
+        """Set up the environment variables for testing,
+        instantiate the backend app and its database ORM object"""
         set_environment_vars()
 
         # Careful! We must set the environment variables to test values
@@ -36,13 +41,13 @@ class RestaurantsTestCases(unittest.TestCase):
 
         self.app = app
         self.test_client = app.test_client()
-        self.test_count = 0
         # DEBUGGING: print(f"Using database uri: {self.app.config['SQLALCHEMY_DATABASE_URI']}")
 
         db.drop_all()
         db.create_all()
 
-    def test_no_restaurants(self):
+    def test_get_no_restaurants(self):
+        """Test getting list of restaurants when there are none"""
         resp = self.test_client.get('/restaurants')
         self.assertEqual(resp.status_code, 200)
 
@@ -53,7 +58,8 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(type(resp_dict['restaurants']), list)
         self.assertEqual(len(resp_dict['restaurants']), 0)
 
-    def test_two_restaurants(self):
+    def test_get_two_restaurants(self):
+        """Test getting list of restaurants when there are two"""
         from espresso import db
         from espresso import Restaurant
 
