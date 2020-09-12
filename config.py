@@ -18,6 +18,7 @@ except KeyError as ex:
             "ESPRESSO_DB_USER  ESPRESSO_DB_PASSWORD  ESPRESSO_DB_HOST  ESPRESSO_DB_DATABASE_NAME")
     print(f"Environment variable {ex.args[0]} is missing")
     print(f"Please set {ex.args[0]} and restart the app")
+    raise
 else:
     db_url = f"postgres+psycopg2://{db_user}:{db_password}@{db_host}/{db_database_name}"
     SQLALCHEMY_DATABASE_URI = db_url
