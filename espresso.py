@@ -40,8 +40,8 @@ class Restaurant(db.Model):
 def index():
     return 'Hello from espresso'
 
-def restaurant_to_json(rest):
-    """Convert a Restaurant object to json object"""
+def restaurant_to_dict(rest):
+    """Convert a Restaurant object to a dictionary"""
     rest_item = {'id': rest.id, 'name': rest.name, 'street': rest.street, 'suite': rest.suite,
                  'city': rest.city, 'state': rest.state, 'zip_code': rest.zip_code,
                  'phone_num': rest.phone_num, 'website': rest.website, 'email': rest.email,
@@ -55,7 +55,7 @@ def restaurants():
         restaurants = Restaurant.query.filter_by().order_by(Restaurant.id)
         rest_list = []
         for rest in restaurants:
-            rest_item = restaurant_to_json(rest)
+            rest_item = restaurant_to_dict(rest)
             rest_list.append(rest_item)
     except Exception as ex:
         print('Failed to retrieve list of restaurants for "/restaurants" endpoint')
@@ -82,7 +82,7 @@ def restaurant_by_id(rest_id):
         return jsonify(ret_val), 500
     else:
         if rest:
-            rest_item = restaurant_to_json(rest)
+            rest_item = restaurant_to_dict(rest)
             ret_val = {'success': True, 'restaurant': rest_item}
             return jsonify(ret_val), 200
         else:
