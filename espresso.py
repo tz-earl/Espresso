@@ -74,10 +74,9 @@ def restaurant_by_id(rest_id):
     try:
         rest = Restaurant.query.get(rest_id)
     except Exception as ex:
-        print(f'Failed to retrieve restaurant for "/restaurants/{id}" endpoint')
-        print(f'Exception was thrown: {str(ex)}')
+        print(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
         ret_val = {'success': False,
-            'message': f'Server failure: restaurant with id number {id} could not be retrieved',
+            'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
             'error-string': str(ex)
             }
         return jsonify(ret_val), 500

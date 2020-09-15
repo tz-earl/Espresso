@@ -104,3 +104,11 @@ class RestaurantsTestCases(unittest.TestCase):
         # id 2 does not exist.
         resp = self.test_client.get('/restaurants/2')
         self.assertEqual(resp.status_code, 404)
+
+    def test_get_restaurant_by_id_not_number(self):
+        """Test getting a restaurant by a non-integer id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        resp = self.test_client.get('/restaurants/hello')
+        self.assertEqual(resp.status_code, 500)
