@@ -75,3 +75,48 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(len(resp_dict['restaurants']), 2)
         self.assertEqual(resp_dict['restaurants'][0]['name'], name_1)
         self.assertEqual(resp_dict['restaurants'][1]['name'], name_2)
+
+    def test_get_restaurant_by_id(self):
+        """Test getting a specific restaurant by its id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name_1))
+        db.session.commit()
+
+        # Since this is a freshly created table, the first id should be 1
+        resp = self.test_client.get('/restaurants/1')
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['restaurant']['name'], name_1)
+
+    def test_get_restaurant_by_id_none(self):
+        """Test getting a restaurant by a non-existent id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name_1))
+        db.session.commit()
+
+        # Since this is a freshly created table, the only id should be 1.
+        # id 2 does not exist.
+        resp = self.test_client.get('/restaurants/2')
+        self.assertEqual(resp.status_code, 404)
+
+    def test_get_restaurant_by_id_not_number(self):
+        """Test getting a restaurant by a non-integer id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        resp = self.test_client.get('/restaurants/hello')
+        self.assertEqual(resp.status_code, 500)
+
+    def test_get_restaurant_404_not_found(self):
+        """Test getting a restaurant with a non-existent subpath"""
+        from espresso import db
+        from espresso import Restaurant
+
+        resp = self.test_client.get('/restaurants/1/hello')
+        self.assertEqual(resp.status_code, 404)
