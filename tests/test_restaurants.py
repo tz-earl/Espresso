@@ -120,3 +120,13 @@ class RestaurantsTestCases(unittest.TestCase):
 
         resp = self.test_client.get('/restaurants/1/hello')
         self.assertEqual(resp.status_code, 404)
+
+    def test_get_restaurant_405_method_not_allowed(self):
+        """Test using POST method that is not allowed"""
+        from espresso import db
+        from espresso import Restaurant
+
+        resp = self.test_client.post('/restaurants')
+        self.assertEqual(resp.status_code, 405)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['success'], False)
