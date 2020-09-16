@@ -6,6 +6,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import jsonify
+from flask_cors import CORS
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -15,6 +16,10 @@ app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+# These values for the origins argument to CORS are just examples
+# of what might be allowed as far as the origins of requestors.
+CORS(app, supports_credentials=True, origins=['http://127.0.0.1:*', 'http://www.example.com:1000'])
 
 
 class Restaurant(db.Model):
