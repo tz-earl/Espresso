@@ -97,6 +97,14 @@ def not_found(error):
                }
     return jsonify(ret_val), 404
 
+@app.errorhandler(405)
+def method_not_allowed(error):
+    ret_val = {'success': False,
+               'message': 'Method not allowed for the requested URL',
+               'error-string': str(error)
+               }
+    return jsonify(ret_val), 405
+
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
