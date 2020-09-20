@@ -19,7 +19,7 @@ migrate = Migrate(app, db)
 
 # These values for the origins argument to CORS are just examples
 # of what might be allowed as far as the origins of requestors.
-CORS(app, supports_credentials=True, origins=['http://127.0.0.1:*', 'http://www.example.com:1000'])
+CORS(app, supports_credentials=True, origins=['http://127.0.0.1:*', 'http://localhost:3000'])
 
 
 class Restaurant(db.Model):
