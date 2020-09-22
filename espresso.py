@@ -2,11 +2,16 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+import logging
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import jsonify
 from flask_cors import CORS
+
+# SQLAlchemy exceptions
+from sqlalchemy import exc
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -63,11 +68,10 @@ def restaurants():
             rest_item = restaurant_to_dict(rest)
             rest_list.append(rest_item)
     except Exception as ex:
-        print('Failed to retrieve list of restaurants for "/restaurants" endpoint')
-        print(f'Exception was thrown: {str(ex)}')
+        logging.error('Failed to retrieve list of restaurants for "/restaurants" endpoint')
+        logging.error(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
             'message': 'Server failure: list of restaurants could not be retrieved',
-            'error-string': str(ex)
             }
         return jsonify(ret_val), 500
     else:
@@ -78,13 +82,20 @@ def restaurants():
 def restaurant_by_id(rest_id):
     try:
         rest = Restaurant.query.get(rest_id)
-    except Exception as ex:
-        print(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
+    except exc.ProgrammingError as ex:
+        logging.error(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
+        logging.error(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
-            'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
-            'error-string': str(ex)
-            }
+                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
+                   }
         return jsonify(ret_val), 500
+    except exc.DataError as ex:
+        logging.warning(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
+        logging.warning(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+                   'message': f'Restaurant with id number {rest_id} could not be retrieved',
+                   }
+        return jsonify(ret_val), 400
     else:
         if rest:
             rest_item = restaurant_to_dict(rest)
@@ -96,17 +107,17 @@ def restaurant_by_id(rest_id):
 
 @app.errorhandler(404)
 def not_found(error):
+    logging.warning(error)
     ret_val = {'success': False,
                'message': 'Resource was not found, check the url',
-               'error-string': str(error)
                }
     return jsonify(ret_val), 404
 
 @app.errorhandler(405)
 def method_not_allowed(error):
+    logging.warning(error)
     ret_val = {'success': False,
                'message': 'Method not allowed for the requested URL',
-               'error-string': str(error)
                }
     return jsonify(ret_val), 405
 
