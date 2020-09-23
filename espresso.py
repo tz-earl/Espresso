@@ -2,16 +2,17 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+import json
 import logging
 
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import jsonify
 from flask_cors import CORS
 
-# SQLAlchemy exceptions
-from sqlalchemy import exc
+from sqlalchemy import exc as sqlalchemy_exceptions
+from werkzeug import exceptions as werkzeug_exceptions
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -82,14 +83,14 @@ def restaurants():
 def restaurant_by_id(rest_id):
     try:
         rest = Restaurant.query.get(rest_id)
-    except exc.ProgrammingError as ex:
+    except sqlalchemy_exceptions.ProgrammingError as ex:
         logging.error(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
         logging.error(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
                    'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
                    }
         return jsonify(ret_val), 500
-    except exc.DataError as ex:
+    except sqlalchemy_exceptions.DataError as ex:
         logging.warning(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
         logging.warning(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
@@ -104,6 +105,28 @@ def restaurant_by_id(rest_id):
         else:
             ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
             return jsonify(ret_val), 404
+
+@app.route('/restaurants/create', methods=['POST'])
+def restaurant_create():
+    json_dict = None
+    try:
+        json_dict = request.json
+    except werkzeug_exceptions.BadRequest as ex:
+        logging.warning('Could not decode the json content')
+        logging.warning(str(ex))
+        ret_val = {'success': False, 'message': str(ex)}
+        return jsonify(ret_val), 400
+    else:
+        ret_val = {'success': True, 'message': f'Created restaurant with name {json_dict["name"]}'}
+        return jsonify(ret_val), 200
+
+@app.errorhandler(400)
+def bad_request(error):
+    logging.warning(error)
+    ret_val = {'success': False,
+               'message': str(error)
+               }
+    return jsonify(ret_val), 400
 
 @app.errorhandler(404)
 def not_found(error):
