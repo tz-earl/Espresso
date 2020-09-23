@@ -111,7 +111,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         resp = self.test_client.get('/restaurants/hello')
-        self.assertEqual(resp.status_code, 500)
+        self.assertEqual(resp.status_code, 400)
 
     def test_get_restaurant_404_not_found(self):
         """Test getting a restaurant with a non-existent subpath"""
