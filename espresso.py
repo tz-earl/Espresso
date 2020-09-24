@@ -117,8 +117,9 @@ def restaurant_create():
         ret_val = {'success': False, 'message': str(ex)}
         return jsonify(ret_val), 400
     else:
-        ret_val = {'success': True, 'message': f'Created restaurant with name {json_dict["name"]}'}
-        return jsonify(ret_val), 200
+        name = json_dict["name"]
+        ret_val = {'success': False, 'message': f'Not yet implemented: did not create restaurant'}
+        return jsonify(ret_val), 501
 
 @app.errorhandler(400)
 def bad_request(error):

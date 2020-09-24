@@ -130,3 +130,13 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
+
+    def test_create_restaurant_with_name(self):
+        """Test creation of a restaurant with only the name field"""
+        from espresso import db
+        from espresso import Restaurant
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': 'Restaurant Chinois'}
+        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 200)
