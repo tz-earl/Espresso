@@ -117,9 +117,28 @@ def restaurant_create():
         ret_val = {'success': False, 'message': str(ex)}
         return jsonify(ret_val), 400
     else:
-        name = json_dict["name"]
-        ret_val = {'success': False, 'message': f'Not yet implemented: did not create restaurant'}
-        return jsonify(ret_val), 501
+        name = json_dict.get('name', None)  # name is required, validate this
+        if not name:
+            ret_val = {'success': False, 'message': f'Name of restaurant is required'}
+            return jsonify(ret_val), 400
+
+        rest = Restaurant(name=name)
+
+        rest.street = json_dict.get('street', None)
+        rest.suite = json_dict.get('suite', None)
+        rest.city = json_dict.get('city', None)
+        rest.state = json_dict.get('state', None)
+        rest.zip_code = json_dict.get('zip_code', None)
+        rest.phone_num = json_dict.get('phone_num', None)
+        rest.website = json_dict.get('website', None)
+        rest.email = json_dict.get('email', None)
+        rest.date_established = json_dict.get('date_established', None)
+
+        db.session.add(rest)
+        db.session.commit()
+
+        ret_val = {'success': True, 'message': f'Restaurant created with name: {rest.name}'}
+        return jsonify(ret_val), 200
 
 @app.errorhandler(400)
 def bad_request(error):
