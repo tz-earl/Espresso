@@ -131,7 +131,7 @@ class RestaurantsTestCases(unittest.TestCase):
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
 
-    def test_create_restaurant_with_name(self):
+    def test_create_restaurant_with_name_only(self):
         """Test creation of a restaurant with only the name field"""
         from espresso import db
         from espresso import Restaurant
@@ -140,3 +140,27 @@ class RestaurantsTestCases(unittest.TestCase):
         info = {'name': 'Restaurant Chinois'}
         resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 200)
+
+    def test_create_restaurant_with_all_fields(self):
+        """Test creation of a restaurant with fields provided"""
+        from espresso import db
+        from espresso import Restaurant
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': 'Restaurant Chinois', 'street': '999 Sutter St', 'suite': '510',
+                'city': 'Wood-Ridge', 'state': 'NJ', 'phone_num': '201-555-7777',
+                'website': 'www.chinois-nj.com', 'email': 'chinois-nj@gmail.com',
+                'date_established': ''}
+
+        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_create_restaurant_no_name(self):
+        """Test creation of a restaurant with only the name field"""
+        from espresso import db
+        from espresso import Restaurant
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'city': 'Restaurant Japonais'}
+        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 400)
