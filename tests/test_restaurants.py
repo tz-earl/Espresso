@@ -1,5 +1,6 @@
 import os
 import json
+import re
 
 import unittest
 
@@ -137,9 +138,13 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
-        info = {'name': 'Restaurant Chinois'}
+        name = 'Restaurant Chinois'
+        info = {'name': name}
         resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+
         self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
     def test_create_restaurant_with_all_fields(self):
         """Test creation of a restaurant with fields provided"""
@@ -147,13 +152,16 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
-        info = {'name': 'Restaurant Chinois', 'street': '999 Sutter St', 'suite': '510',
+        name = 'Restaurant Chinois'
+        info = {'name': name, 'street': '999 Sutter St', 'suite': '510',
                 'city': 'Wood-Ridge', 'state': 'NJ', 'phone_num': '201-555-7777',
                 'website': 'www.chinois-nj.com', 'email': 'chinois-nj@gmail.com',
                 'date_established': ''}
-
         resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+
         self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
     def test_create_restaurant_no_name(self):
         """Test creation of a restaurant with only the name field"""
