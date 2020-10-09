@@ -183,7 +183,10 @@ def restaurant_update(rest_id):
     rest.email = json_dict.get('email', rest.email)
     rest.date_established = json_dict.get('date_established', rest.date_established)
 
-    ## TODO. Check that restaurant name is not an empty string
+    # Restaurant name may not be blank
+    if not rest.name:
+        ret_val = {'success': False, 'message': f'Name of restaurant may not be blank'}
+        return jsonify(ret_val), 400
 
     db.session.add(rest)
     db.session.commit()

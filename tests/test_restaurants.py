@@ -203,3 +203,17 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp_dict['restaurant']['id'], 1)
         self.assertEqual(resp_dict['restaurant']['website'], website)
         self.assertEqual(resp_dict['restaurant']['email'], email)
+
+    def test_update_restaurant_blank_name(self):
+        """Test update of a restaurant with the name field an empty string"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name = 'Restaurant Mexicano'
+        db.session.add(Restaurant(name=name))
+        db.session.commit()
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': ''}
+        resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 400)
