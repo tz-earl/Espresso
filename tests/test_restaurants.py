@@ -202,4 +202,4 @@ class RestaurantsTestCases(unittest.TestCase):
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['restaurant']['id'], 1)
         self.assertEqual(resp_dict['restaurant']['website'], website)
-        self.assertEqual(resp_dict['email'], email)
+        self.assertEqual(resp_dict['restaurant']['email'], email)
