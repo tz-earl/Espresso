@@ -75,9 +75,9 @@ def restaurants():
             'message': 'Server failure: list of restaurants could not be retrieved',
             }
         return jsonify(ret_val), 500
-    else:
-        ret_val = {'success': True, 'restaurants': rest_list}
-        return jsonify(ret_val), 200
+
+    ret_val = {'success': True, 'restaurants': rest_list}
+    return jsonify(ret_val), 200
 
 @app.route('/restaurants/<rest_id>', methods=['GET'])
 def restaurant_by_id(rest_id):
@@ -97,14 +97,14 @@ def restaurant_by_id(rest_id):
                    'message': f'Restaurant with id number {rest_id} could not be retrieved',
                    }
         return jsonify(ret_val), 400
-    else:
-        if rest:
-            rest_item = restaurant_to_dict(rest)
-            ret_val = {'success': True, 'restaurant': rest_item}
-            return jsonify(ret_val), 200
-        else:
-            ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
-            return jsonify(ret_val), 404
+
+    if not rest:
+        ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
+        return jsonify(ret_val), 404
+
+    rest_item = restaurant_to_dict(rest)
+    ret_val = {'success': True, 'restaurant': rest_item}
+    return jsonify(ret_val), 200
 
 @app.route('/restaurants/create', methods=['POST'])
 def restaurant_create():
