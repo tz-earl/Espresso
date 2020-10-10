@@ -162,6 +162,9 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
+        # TODO. Add the id of the restaurant to the response
+
+        # TODO. Retrieve the restaurant and assert that all fields are as created
 
     def test_create_restaurant_no_name(self):
         """Test creation of a restaurant with only the name field"""
@@ -169,6 +172,48 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
-        info = {'city': 'Restaurant Japonais'}
+        info = {'city': 'Chicago'}
         resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 400)
+
+    def test_update_restaurant(self):
+        """Test update of an existing restaurant's website and email address"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name = 'Restaurant Mexicano'
+        db.session.add(Restaurant(name=name))
+        db.session.commit()
+
+        headers = {'Content-Type': 'application/json'}
+        website = 'www.mexicano-nj.com'
+        email = 'mexicano-nj@gmail.com'
+        info = {'website': website, 'email': email}
+        resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
+
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['id'], 1)
+        self.assertNotEqual(re.search(name, resp_dict['message']), None)
+
+        resp = self.test_client.get('/restaurants/1')
+
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['restaurant']['id'], 1)
+        self.assertEqual(resp_dict['restaurant']['website'], website)
+        self.assertEqual(resp_dict['restaurant']['email'], email)
+
+    def test_update_restaurant_blank_name(self):
+        """Test update of a restaurant with the name field an empty string"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name = 'Restaurant Mexicano'
+        db.session.add(Restaurant(name=name))
+        db.session.commit()
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': ''}
+        resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
