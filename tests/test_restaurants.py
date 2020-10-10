@@ -170,9 +170,8 @@ class RestaurantsTestCases(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['id'], 1)
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
-
-        # TODO. Add the id of the restaurant to the response
 
         # Retrieve the restaurant and assert that all fields are as created
         resp = self.test_client.get('/restaurants/1')

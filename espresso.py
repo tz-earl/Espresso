@@ -137,7 +137,9 @@ def restaurant_create():
     db.session.add(rest)
     db.session.commit()
 
-    ret_val = {'success': True, 'message': f'Restaurant created with name: {rest.name}'}
+    ret_val = {'success': True,
+               'id': rest.id,
+               'message': f'Restaurant created with name: {rest.name}'}
     return jsonify(ret_val), 200
 
 @app.route('/restaurants/<rest_id>', methods=['PUT'])
