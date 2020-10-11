@@ -153,18 +153,42 @@ class RestaurantsTestCases(unittest.TestCase):
 
         headers = {'Content-Type': 'application/json'}
         name = 'Restaurant Chinois'
-        info = {'name': name, 'street': '999 Sutter St', 'suite': '510',
-                'city': 'Wood-Ridge', 'state': 'NJ', 'phone_num': '201-555-7777',
-                'website': 'www.chinois-nj.com', 'email': 'chinois-nj@gmail.com',
-                'date_established': ''}
+        street = '999 Sutter St'
+        suite = '510'
+        city = 'Wood-Ridge'
+        state = 'NJ'
+        zip_code = '07075'
+        phone_num = '201-555-7777'
+        website = 'www.chinois-nj.com'
+        email = 'chinois-nj@gmail.com'
+        date_established = '2014'
+        info = {'name': name, 'street': street, 'suite': suite,
+                'city': city, 'state': state, 'zip_code': zip_code,
+                'phone_num': phone_num, 'website': website, 'email': email,
+                'date_established': date_established}
         resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['id'], 1)
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
-        # TODO. Add the id of the restaurant to the response
 
-        # TODO. Retrieve the restaurant and assert that all fields are as created
+        # Retrieve the restaurant and assert that all fields are as created
+        resp = self.test_client.get('/restaurants/1')
+
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['restaurant']['id'], 1)
+        self.assertEqual(resp_dict['restaurant']['name'], name)
+        self.assertEqual(resp_dict['restaurant']['street'], street)
+        self.assertEqual(resp_dict['restaurant']['suite'], suite)
+        self.assertEqual(resp_dict['restaurant']['city'], city)
+        self.assertEqual(resp_dict['restaurant']['state'], state)
+        self.assertEqual(resp_dict['restaurant']['zip_code'], zip_code)
+        self.assertEqual(resp_dict['restaurant']['phone_num'], phone_num)
+        self.assertEqual(resp_dict['restaurant']['website'], website)
+        self.assertEqual(resp_dict['restaurant']['email'], email)
+        self.assertEqual(resp_dict['restaurant']['date_established'], date_established)
 
     def test_create_restaurant_no_name(self):
         """Test creation of a restaurant with only the name field"""
