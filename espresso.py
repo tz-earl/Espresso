@@ -11,8 +11,8 @@ from flask_migrate import Migrate
 from flask import jsonify
 from flask_cors import CORS
 
-from sqlalchemy import exc as sqlalchemy_exceptions
-from werkzeug import exceptions as werkzeug_exceptions
+from sqlalchemy import exc as sqlalchemy_exc
+from werkzeug import exceptions as werkzeug_exc
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -60,6 +60,29 @@ def restaurant_to_dict(rest):
                  }
     return rest_item
 
+def retrieve_restaurant(rest_id):
+    """Given a restaurant id, retrieve it from the model/database"""
+    rest = ret_val = http_status = None
+    try:
+        rest = Restaurant.query.get(rest_id)
+    except (sqlalchemy_exc.ProgrammingError, sqlalchemy_exc.DataError) as ex:
+        logging.error(f'Failed to retrieve restaurant for id {rest_id}')
+        logging.error(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+                   'id': rest_id,
+                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
+                   }
+        if isinstance(ex, sqlalchemy_exc.ProgrammingError):
+            http_status = 500
+        elif isinstance(ex, sqlalchemy_exc.DataError):
+            http_status = 400
+    else:
+        if not rest:
+            ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
+            http_status = 404
+
+    return (rest, ret_val, http_status)
+
 @app.route('/restaurants', methods=['GET'])
 def restaurants():
     try:
@@ -81,26 +104,9 @@ def restaurants():
 
 @app.route('/restaurants/<rest_id>', methods=['GET'])
 def restaurant_by_id(rest_id):
-    try:
-        rest = Restaurant.query.get(rest_id)
-    except sqlalchemy_exceptions.ProgrammingError as ex:
-        logging.error(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
-        logging.error(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 500
-    except sqlalchemy_exceptions.DataError as ex:
-        logging.warning(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
-        logging.warning(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 400
-
-    if not rest:
-        ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
-        return jsonify(ret_val), 404
+    rest, ret_val, http_status = retrieve_restaurant(rest_id)
+    if ret_val:  # Something went awry
+        return jsonify(ret_val), http_status
 
     rest_item = restaurant_to_dict(rest)
     ret_val = {'success': True, 'restaurant': rest_item}
@@ -111,7 +117,7 @@ def restaurant_create():
     json_dict = None
     try:
         json_dict = request.json
-    except werkzeug_exceptions.BadRequest as ex:
+    except werkzeug_exc.BadRequest as ex:
         logging.warning('Could not decode the json content')
         logging.warning(str(ex))
         ret_val = {'success': False, 'message': str(ex)}
@@ -144,31 +150,14 @@ def restaurant_create():
 
 @app.route('/restaurants/<rest_id>', methods=['PUT'])
 def restaurant_update(rest_id):
-    try:
-        rest = Restaurant.query.get(rest_id)
-    except sqlalchemy_exceptions.ProgrammingError as ex:
-        logging.error(f'Failed to retrieve restaurant for update for "/restaurants/{rest_id}" endpoint')
-        logging.error(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 500
-    except sqlalchemy_exceptions.DataError as ex:
-        logging.warning(f'Failed to retrieve restaurant for update for "/restaurants/{rest_id}" endpoint')
-        logging.warning(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 400
-
-    if not rest:
-        ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
-        return jsonify(ret_val), 404
+    rest, ret_val, http_status = retrieve_restaurant(rest_id)
+    if ret_val:  # Something went awry
+        return jsonify(ret_val), http_status
 
     json_dict = None
     try:
         json_dict = request.json
-    except werkzeug_exceptions.BadRequest as ex:
+    except werkzeug_exc.BadRequest as ex:
         logging.warning('Could not decode the json content')
         logging.warning(str(ex))
         ret_val = {'success': False, 'message': str(ex)}
@@ -201,29 +190,9 @@ def restaurant_update(rest_id):
 
 @app.route('/restaurants/<rest_id>', methods=['DELETE'])
 def restaurant_delete(rest_id):
-    try:
-        rest = Restaurant.query.get(rest_id)
-    except sqlalchemy_exceptions.ProgrammingError as ex:
-        logging.error(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
-        logging.error(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 500
-    except sqlalchemy_exceptions.DataError as ex:
-        logging.warning(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
-        logging.warning(f'Exception was thrown: {str(ex)}')
-        ret_val = {'success': False,
-                   'message': f'Restaurant with id number {rest_id} could not be retrieved',
-                   }
-        return jsonify(ret_val), 400
-
-    if not rest:
-        ret_val = {'success': False,
-                   'id': rest_id,
-                   'message': f'Could not delete restaurant: no restaurant with id {rest_id} found'
-                   }
-        return jsonify(ret_val), 404
+    rest, ret_val, http_status = retrieve_restaurant(rest_id)
+    if ret_val:  # Something went awry
+        return jsonify(ret_val), http_status
 
     db.session.delete(rest)
     db.session.commit()
