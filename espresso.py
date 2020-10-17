@@ -199,6 +199,41 @@ def restaurant_update(rest_id):
                }
     return jsonify(ret_val), 200
 
+@app.route('/restaurants/<rest_id>', methods=['DELETE'])
+def restaurant_delete(rest_id):
+    try:
+        rest = Restaurant.query.get(rest_id)
+    except sqlalchemy_exceptions.ProgrammingError as ex:
+        logging.error(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
+        logging.error(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+                   'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
+                   }
+        return jsonify(ret_val), 500
+    except sqlalchemy_exceptions.DataError as ex:
+        logging.warning(f'Failed to retrieve restaurant for "/restaurants/{rest_id}" endpoint')
+        logging.warning(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+                   'message': f'Restaurant with id number {rest_id} could not be retrieved',
+                   }
+        return jsonify(ret_val), 400
+
+    if not rest:
+        ret_val = {'success': False,
+                   'id': rest_id,
+                   'message': f'Could not delete restaurant: no restaurant with id {rest_id} found'
+                   }
+        return jsonify(ret_val), 404
+
+    db.session.delete(rest)
+    db.session.commit()
+
+    ret_val = {'success': True,
+               'id': rest_id,
+               'message': f'Restaurant deleted: {rest.name}'
+               }
+    return jsonify(ret_val), 200
+
 @app.errorhandler(400)
 def bad_request(error):
     logging.warning(error)

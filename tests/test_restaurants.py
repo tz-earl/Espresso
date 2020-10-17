@@ -241,3 +241,32 @@ class RestaurantsTestCases(unittest.TestCase):
         info = {'name': ''}
         resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
+
+    def test_delete_restaurant(self):
+        """Test deleting a specific restaurant by its id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name_1))
+        db.session.commit()
+
+        # Since this is a freshly created table, the first id should be 1
+        resp = self.test_client.delete('/restaurants/1')
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['success'], True)
+
+        resp = self.test_client.get('/restaurants/1')
+        self.assertEqual(resp.status_code, 404)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['success'], False)
+
+    def test_delete_restaurant_by_id_none(self):
+        """Test deleting a restaurant by a non-existent id number"""
+        from espresso import db
+        from espresso import Restaurant
+
+        # Since this is a freshly created table, there are no restaurants
+        resp = self.test_client.get('/restaurants/1')
+        self.assertEqual(resp.status_code, 404)
