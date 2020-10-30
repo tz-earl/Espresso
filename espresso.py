@@ -48,7 +48,7 @@ class Restaurant(db.Model):
 #----------------------------------------------------------------------------#
 
 RESTAURANTS_API_V1_BASE = '/api/v1/restaurants'
-API_VERSION = 'v1'
+API_VERSION = '1.0'
 
 @app.route('/', methods=['GET'])
 def index():
