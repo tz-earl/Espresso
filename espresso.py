@@ -48,6 +48,7 @@ class Restaurant(db.Model):
 #----------------------------------------------------------------------------#
 
 RESTAURANTS_API_V1_BASE = '/api/v1/restaurants'
+API_VERSION = 'v1'
 
 @app.route('/', methods=['GET'])
 def index():
@@ -72,7 +73,9 @@ def retrieve_restaurant(rest_id):
         logging.error(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
                    'id': rest_id,
+                   'restaurant': None,
                    'message': f'Server failure: restaurant with id number {rest_id} could not be retrieved',
+                   'api_version': API_VERSION
                    }
         if isinstance(ex, sqlalchemy_exc.ProgrammingError):
             http_status = 500
@@ -80,7 +83,10 @@ def retrieve_restaurant(rest_id):
             http_status = 400
     else:
         if not rest:
-            ret_val = {'success': False, 'message': f'No restaurant with id {rest_id} found'}
+            ret_val = {'success': False, 'id': rest_id, 'restaurant': None,
+                       'message': f'No restaurant with id {rest_id} found',
+                       'api_version': API_VERSION
+                      }
             http_status = 404
 
     return (rest, ret_val, http_status)
@@ -97,11 +103,13 @@ def restaurants():
         logging.error('Failed to retrieve list of restaurants for "/restaurants" endpoint')
         logging.error(f'Exception was thrown: {str(ex)}')
         ret_val = {'success': False,
+            'restaurants': None,
             'message': 'Server failure: list of restaurants could not be retrieved',
+            'api_version': API_VERSION
             }
         return jsonify(ret_val), 500
 
-    ret_val = {'success': True, 'restaurants': rest_list}
+    ret_val = {'success': True, 'restaurants': rest_list, 'message': None, 'api_version': API_VERSION}
     return jsonify(ret_val), 200
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
@@ -111,7 +119,9 @@ def restaurant_by_id(rest_id):
         return jsonify(ret_val), http_status
 
     rest_item = restaurant_to_dict(rest)
-    ret_val = {'success': True, 'restaurant': rest_item}
+    ret_val = {'success': True, 'id': rest_id, 'restaurant': rest_item, 'message': None,
+               'api_version': API_VERSION
+              }
     return jsonify(ret_val), 200
 
 @app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
@@ -122,12 +132,14 @@ def restaurant_create():
     except werkzeug_exc.BadRequest as ex:
         logging.warning('Could not decode the json content')
         logging.warning(str(ex))
-        ret_val = {'success': False, 'message': str(ex)}
+        ret_val = {'success': False, 'id': None, 'message': str(ex), 'api_version': API_VERSION}
         return jsonify(ret_val), 400
 
     name = json_dict.get('name', None)  # name is required, validate this
     if not name:
-        ret_val = {'success': False, 'message': f'Name of restaurant is required'}
+        ret_val = {'success': False, 'id': None, 'message': f'Name of restaurant is required',
+                   'api_version': API_VERSION
+                  }
         return jsonify(ret_val), 400
 
     rest = Restaurant(name=name)
@@ -147,7 +159,9 @@ def restaurant_create():
 
     ret_val = {'success': True,
                'id': rest.id,
-               'message': f'Restaurant created with name: {rest.name}'}
+               'message': f'Restaurant created with name: {rest.name}',
+               'api_version': API_VERSION
+               }
     return jsonify(ret_val), 200
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
@@ -162,7 +176,9 @@ def restaurant_update(rest_id):
     except werkzeug_exc.BadRequest as ex:
         logging.warning('Could not decode the json content')
         logging.warning(str(ex))
-        ret_val = {'success': False, 'message': str(ex)}
+        ret_val = {'success': False, 'id': rest.id, 'restaurant': None, 'message': str(ex),
+                   'api_version': API_VERSION
+                  }
         return jsonify(ret_val), 400
 
     rest.name = json_dict.get('name', rest.name)
@@ -178,7 +194,10 @@ def restaurant_update(rest_id):
 
     # Restaurant name may not be blank
     if not rest.name:
-        ret_val = {'success': False, 'message': f'Name of restaurant may not be blank'}
+        ret_val = {'success': False, 'id': rest.id, 'restaurant': None,
+                   'message': f'Name of restaurant may not be blank',
+                   'api_version': API_VERSION
+                  }
         return jsonify(ret_val), 400
 
     db.session.add(rest)
@@ -186,7 +205,9 @@ def restaurant_update(rest_id):
 
     ret_val = {'success': True,
                'id': rest.id,
-               'message': f"Restaurant updated: {rest.name}"
+               'restaurant': None,
+               'message': f"Restaurant updated: {rest.name}",
+               'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
 
@@ -201,7 +222,9 @@ def restaurant_delete(rest_id):
 
     ret_val = {'success': True,
                'id': rest_id,
-               'message': f'Restaurant deleted: {rest.name}'
+               'restaurant': None,
+               'message': f'Restaurant deleted: {rest.name}',
+               'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
 
