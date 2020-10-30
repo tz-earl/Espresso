@@ -44,12 +44,14 @@ class RestaurantsTestCases(unittest.TestCase):
         self.test_client = app.test_client()
         # DEBUGGING: print(f"Using database uri: {self.app.config['SQLALCHEMY_DATABASE_URI']}")
 
+        self.API_V1_BASE = '/api/v1/restaurants'
+
         db.drop_all()
         db.create_all()
 
     def test_get_no_restaurants(self):
         """Test getting list of restaurants when there are none"""
-        resp = self.test_client.get('/restaurants')
+        resp = self.test_client.get(self.API_V1_BASE)
         self.assertEqual(resp.status_code, 200)
 
         resp_dict = json.loads(resp.data)
@@ -70,7 +72,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.add(Restaurant(name=name_2))
         db.session.commit()
 
-        resp = self.test_client.get('/restaurants')
+        resp = self.test_client.get(self.API_V1_BASE)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(len(resp_dict['restaurants']), 2)
@@ -87,7 +89,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.get('/restaurants/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1')
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['restaurant']['name'], name_1)
@@ -103,7 +105,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         # Since this is a freshly created table, the only id should be 1.
         # id 2 does not exist.
-        resp = self.test_client.get('/restaurants/2')
+        resp = self.test_client.get(self.API_V1_BASE + '/2')
         self.assertEqual(resp.status_code, 404)
 
     def test_get_restaurant_by_id_not_number(self):
@@ -111,7 +113,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.get('/restaurants/hello')
+        resp = self.test_client.get(self.API_V1_BASE + '/hello')
         self.assertEqual(resp.status_code, 400)
 
     def test_get_restaurant_404_not_found(self):
@@ -119,7 +121,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.get('/restaurants/1/hello')
+        resp = self.test_client.get(self.API_V1_BASE + '/1/hello')
         self.assertEqual(resp.status_code, 404)
 
     def test_get_restaurant_405_method_not_allowed(self):
@@ -127,7 +129,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.post('/restaurants')
+        resp = self.test_client.post(self.API_V1_BASE)
         self.assertEqual(resp.status_code, 405)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -140,7 +142,7 @@ class RestaurantsTestCases(unittest.TestCase):
         headers = {'Content-Type': 'application/json'}
         name = 'Restaurant Chinois'
         info = {'name': name}
-        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -166,7 +168,7 @@ class RestaurantsTestCases(unittest.TestCase):
                 'city': city, 'state': state, 'zip_code': zip_code,
                 'phone_num': phone_num, 'website': website, 'email': email,
                 'date_established': date_established}
-        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -174,7 +176,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
         # Retrieve the restaurant and assert that all fields are as created
-        resp = self.test_client.get('/restaurants/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1')
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -197,7 +199,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         headers = {'Content-Type': 'application/json'}
         info = {'city': 'Chicago'}
-        resp = self.test_client.post('/restaurants/create', headers=headers, data=json.dumps(info))
+        resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
 
     def test_update_restaurant(self):
@@ -213,14 +215,14 @@ class RestaurantsTestCases(unittest.TestCase):
         website = 'www.mexicano-nj.com'
         email = 'mexicano-nj@gmail.com'
         info = {'website': website, 'email': email}
-        resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
+        resp = self.test_client.put(self.API_V1_BASE + '/1', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['id'], 1)
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
-        resp = self.test_client.get('/restaurants/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1')
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -239,7 +241,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         headers = {'Content-Type': 'application/json'}
         info = {'name': ''}
-        resp = self.test_client.put('/restaurants/1', headers=headers, data=json.dumps(info))
+        resp = self.test_client.put(self.API_V1_BASE + '/1', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
 
     def test_delete_restaurant(self):
@@ -252,12 +254,12 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.delete('/restaurants/1')
+        resp = self.test_client.delete(self.API_V1_BASE + '/1')
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], True)
 
-        resp = self.test_client.get('/restaurants/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1')
         self.assertEqual(resp.status_code, 404)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -268,5 +270,5 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         # Since this is a freshly created table, there are no restaurants
-        resp = self.test_client.get('/restaurants/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1')
         self.assertEqual(resp.status_code, 404)

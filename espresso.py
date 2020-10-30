@@ -47,6 +47,8 @@ class Restaurant(db.Model):
 # Controllers.
 #----------------------------------------------------------------------------#
 
+RESTAURANTS_API_V1_BASE = '/api/v1/restaurants'
+
 @app.route('/', methods=['GET'])
 def index():
     return 'Hello from espresso'
@@ -83,7 +85,7 @@ def retrieve_restaurant(rest_id):
 
     return (rest, ret_val, http_status)
 
-@app.route('/restaurants', methods=['GET'])
+@app.route(RESTAURANTS_API_V1_BASE, methods=['GET'])
 def restaurants():
     try:
         restaurants = Restaurant.query.filter_by().order_by(Restaurant.id)
@@ -102,7 +104,7 @@ def restaurants():
     ret_val = {'success': True, 'restaurants': rest_list}
     return jsonify(ret_val), 200
 
-@app.route('/restaurants/<rest_id>', methods=['GET'])
+@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
 def restaurant_by_id(rest_id):
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
@@ -112,7 +114,7 @@ def restaurant_by_id(rest_id):
     ret_val = {'success': True, 'restaurant': rest_item}
     return jsonify(ret_val), 200
 
-@app.route('/restaurants/create', methods=['POST'])
+@app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
 def restaurant_create():
     json_dict = None
     try:
@@ -148,7 +150,7 @@ def restaurant_create():
                'message': f'Restaurant created with name: {rest.name}'}
     return jsonify(ret_val), 200
 
-@app.route('/restaurants/<rest_id>', methods=['PUT'])
+@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
 def restaurant_update(rest_id):
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
@@ -188,7 +190,7 @@ def restaurant_update(rest_id):
                }
     return jsonify(ret_val), 200
 
-@app.route('/restaurants/<rest_id>', methods=['DELETE'])
+@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['DELETE'])
 def restaurant_delete(rest_id):
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
