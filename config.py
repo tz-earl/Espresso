@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv, find_dotenv
 
 SECRET_KEY = os.urandom(32)
 
@@ -8,6 +9,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # Database credentials and set up
 # N.B. A user password is required, otherwise, you get a runtime exception
 # when programmatically opening the Postgres database.
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
 try:
     db_user = os.environ['ESPRESSO_DB_USER']
     db_password = os.environ['ESPRESSO_DB_PASSWORD']
@@ -19,7 +24,7 @@ except KeyError as ex:
     print(f"Environment variable {ex.args[0]} is missing")
     print(f"Please set {ex.args[0]} and restart the app")
     raise
-else:
-    db_url = f"postgres+psycopg2://{db_user}:{db_password}@{db_host}/{db_database_name}"
-    SQLALCHEMY_DATABASE_URI = db_url
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+db_url = f"postgres+psycopg2://{db_user}:{db_password}@{db_host}/{db_database_name}"
+SQLALCHEMY_DATABASE_URI = db_url
+SQLALCHEMY_TRACK_MODIFICATIONS = False

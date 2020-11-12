@@ -1,6 +1,7 @@
 import os
 import json
 import re
+from dotenv import load_dotenv, find_dotenv
 
 import unittest
 
@@ -9,6 +10,9 @@ def set_environment_vars():
     """Set the env vars to have values for testing,
     in particular for the test database
     """
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
 
     # Note that this testing apparently runs in its own environment,
     # so there is no need to save and restore env variables.
