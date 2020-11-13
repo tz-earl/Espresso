@@ -39,16 +39,16 @@ def get_token_auth_header():
 
     if parts[0].lower() != "bearer":
         raise AuthError({"success": False,
-                        "description":
+                        "message":
                             "Invalid header: "
                             "Authorization header must start with"
                             " Bearer"}, 401)
     elif len(parts) == 1:
         raise AuthError({"success": False,
-                        "description": "Invalid header: Token not found"}, 401)
+                        "message": "Invalid header: Token not found"}, 401)
     elif len(parts) > 2:
         raise AuthError({"success": False,
-                        "description":
+                        "message":
                             "Invalid header: "
                             "Authorization header must be"
                             " Bearer token"}, 401)
@@ -84,12 +84,12 @@ def requires_auth(f):
             unverified_header = jwt.get_unverified_header(token)
         except jwt.JWTError:
             raise AuthError({"success": False,
-                            "description":
+                            "message":
                                 "Invalid header: "
                                 "Use an RS256 signed JWT Access Token"}, 401)
         if unverified_header["alg"] == "HS256":
             raise AuthError({"success": False,
-                            "description":
+                            "message":
                                 "Invalid header: "
                                 "Use an RS256 signed JWT Access Token"}, 401)
         rsa_key = {}
@@ -113,15 +113,15 @@ def requires_auth(f):
                 )
             except jwt.ExpiredSignatureError:
                 raise AuthError({"success": False,
-                                "description": "Token is expired"}, 401)
+                                "message": "Token is expired"}, 401)
             except jwt.JWTClaimsError:
                 raise AuthError({"success": False,
-                                "description":
+                                "message":
                                     "Invalid claims,"
                                     " please check the audience and issuer"}, 401)
             except Exception:
                 raise AuthError({"success": False,
-                                "description":
+                                "message":
                                     "Invalid header: "
                                      "Unable to parse authentication"
                                     " token."}, 401)
@@ -129,5 +129,5 @@ def requires_auth(f):
             _request_ctx_stack.top.current_user = payload
             return f(*args, **kwargs)
         raise AuthError({"success": False,
-                        "description": "Invalid header: Unable to find appropriate key"}, 401)
+                        "message": "Invalid header: Unable to find appropriate key"}, 401)
     return decorated
