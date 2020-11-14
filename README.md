@@ -57,6 +57,13 @@ variables are used instead of the normal values as set above.
 `ESPRESSO_TEST_DB_HOST`  
 `ESPRESSO_TEST_DB_DATABASE_NAME`
 
+The above env variables can be set either within a `.env` file that sits at the
+top level of the project directory, or they can be set within the terminal
+environment where the app is run, or some combination of the two.
+
+The syntax is the same for both, e.g.
+`ESPRESSO_DB_USER=earl`
+
 Here some examples of how to run the tests.
 
 `$ python3 -m unittest tests/test_restaurants.py`

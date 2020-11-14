@@ -14,6 +14,8 @@ from flask_cors import CORS
 from sqlalchemy import exc as sqlalchemy_exc
 from werkzeug import exceptions as werkzeug_exc
 
+from auth0_tokens import AuthError, requires_auth, requires_scope
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
