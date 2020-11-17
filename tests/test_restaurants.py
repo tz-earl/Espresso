@@ -4,6 +4,10 @@ import re
 from dotenv import load_dotenv, find_dotenv
 
 import unittest
+import get_auth0_token
+
+# Get the Auth0 access token just once to avoid repeated hits to the Auth0 API
+access_token = get_auth0_token.get_auth0_access_token()
 
 
 def set_environment_vars():
@@ -53,9 +57,14 @@ class RestaurantsTestCases(unittest.TestCase):
         db.drop_all()
         db.create_all()
 
+        # Set up the request header using the Auth0 access token
+        access_token
+
+
     def test_get_no_restaurants(self):
         """Test getting list of restaurants when there are none"""
-        resp = self.test_client.get(self.API_V1_BASE)
+        resp = self.test_client.get(self.API_V1_BASE,
+                                    headers={'authorization': 'Bearer ' + access_token})
         self.assertEqual(resp.status_code, 200)
 
         resp_dict = json.loads(resp.data)
@@ -76,7 +85,8 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.add(Restaurant(name=name_2))
         db.session.commit()
 
-        resp = self.test_client.get(self.API_V1_BASE)
+        resp = self.test_client.get(self.API_V1_BASE,
+                                    headers={'authorization': 'Bearer ' + access_token})
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(len(resp_dict['restaurants']), 2)
