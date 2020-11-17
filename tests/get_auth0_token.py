@@ -1,9 +1,15 @@
 import http.client
 import json
+import os
+from dotenv import load_dotenv, find_dotenv
 
-# Move these two credentials to environment variables.
-AUTHO_CLIENT_ID = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-AUTHO_CLIENT_SECRET = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# Get the AUTHO_CLIENT_ID and AUTHO_CLIENT_SECRET credentials.
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
+AUTHO_CLIENT_ID = os.environ['AUTHO_CLIENT_ID']
+AUTHO_CLIENT_SECRET = os.environ['AUTHO_CLIENT_SECRET']
 
 
 def get_auth0_access_token():
