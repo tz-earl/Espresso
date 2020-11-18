@@ -8,6 +8,7 @@ import get_auth0_token
 
 # Get the Auth0 access token just once to avoid repeated hits to the Auth0 API
 access_token = get_auth0_token.get_auth0_access_token()
+auth_header = {'authorization': 'Bearer ' + access_token}
 
 
 def set_environment_vars():
@@ -63,8 +64,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_get_no_restaurants(self):
         """Test getting list of restaurants when there are none"""
-        resp = self.test_client.get(self.API_V1_BASE,
-                                    headers={'authorization': 'Bearer ' + access_token})
+        resp = self.test_client.get(self.API_V1_BASE, headers=auth_header)
         self.assertEqual(resp.status_code, 200)
 
         resp_dict = json.loads(resp.data)
@@ -85,8 +85,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.add(Restaurant(name=name_2))
         db.session.commit()
 
-        resp = self.test_client.get(self.API_V1_BASE,
-                                    headers={'authorization': 'Bearer ' + access_token})
+        resp = self.test_client.get(self.API_V1_BASE, headers=auth_header)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(len(resp_dict['restaurants']), 2)
@@ -103,7 +102,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.get(self.API_V1_BASE + '/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['restaurant']['name'], name_1)
@@ -119,7 +118,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         # Since this is a freshly created table, the only id should be 1.
         # id 2 does not exist.
-        resp = self.test_client.get(self.API_V1_BASE + '/2')
+        resp = self.test_client.get(self.API_V1_BASE + '/2', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
 
     def test_get_restaurant_by_id_not_number(self):
@@ -127,7 +126,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.get(self.API_V1_BASE + '/hello')
+        resp = self.test_client.get(self.API_V1_BASE + '/hello', headers=auth_header)
         self.assertEqual(resp.status_code, 400)
 
     def test_get_restaurant_404_not_found(self):
@@ -135,7 +134,8 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.get(self.API_V1_BASE + '/1/hello')
+        headers = {'authorization': 'Bearer ' + access_token}
+        resp = self.test_client.get(self.API_V1_BASE + '/1/hello', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
 
     def test_get_restaurant_405_method_not_allowed(self):
@@ -143,7 +143,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        resp = self.test_client.post(self.API_V1_BASE)
+        resp = self.test_client.post(self.API_V1_BASE,headers=auth_header)
         self.assertEqual(resp.status_code, 405)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -154,6 +154,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header)
         name = 'Restaurant Chinois'
         info = {'name': name}
         resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
@@ -168,6 +169,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header)
         name = 'Restaurant Chinois'
         street = '999 Sutter St'
         suite = '510'
@@ -190,7 +192,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
         # Retrieve the restaurant and assert that all fields are as created
-        resp = self.test_client.get(self.API_V1_BASE + '/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header)
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -212,6 +214,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header)
         info = {'city': 'Chicago'}
         resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
@@ -226,6 +229,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header)
         website = 'www.mexicano-nj.com'
         email = 'mexicano-nj@gmail.com'
         info = {'website': website, 'email': email}
@@ -236,7 +240,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp_dict['id'], 1)
         self.assertNotEqual(re.search(name, resp_dict['message']), None)
 
-        resp = self.test_client.get(self.API_V1_BASE + '/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header)
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
@@ -254,6 +258,7 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header)
         info = {'name': ''}
         resp = self.test_client.put(self.API_V1_BASE + '/1', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
@@ -268,12 +273,12 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.delete(self.API_V1_BASE + '/1')
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], True)
 
-        resp = self.test_client.get(self.API_V1_BASE + '/1')
+        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -284,5 +289,5 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         # Since this is a freshly created table, there are no restaurants
-        resp = self.test_client.get(self.API_V1_BASE + '/1')
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 404)

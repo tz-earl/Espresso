@@ -127,6 +127,10 @@ def restaurants():
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
 def restaurant_by_id(rest_id):
+    if not requires_scope('read:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
@@ -140,6 +144,10 @@ def restaurant_by_id(rest_id):
 
 @app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
 def restaurant_create():
+    if not requires_scope('create:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     json_dict = None
     try:
         json_dict = request.json
@@ -181,6 +189,10 @@ def restaurant_create():
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
 def restaurant_update(rest_id):
+    if not requires_scope('update:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
@@ -229,6 +241,10 @@ def restaurant_update(rest_id):
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['DELETE'])
 def restaurant_delete(rest_id):
+    if not requires_scope('delete:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
