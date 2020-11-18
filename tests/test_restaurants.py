@@ -58,10 +58,6 @@ class RestaurantsTestCases(unittest.TestCase):
         db.drop_all()
         db.create_all()
 
-        # Set up the request header using the Auth0 access token
-        access_token
-
-
     def test_get_no_restaurants(self):
         """Test getting list of restaurants when there are none"""
         resp = self.test_client.get(self.API_V1_BASE, headers=auth_header)
