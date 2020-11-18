@@ -126,6 +126,8 @@ def restaurants():
 
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
+@cross_origin()
+@requires_auth
 def restaurant_by_id(rest_id):
     if not requires_scope('read:restaurants'):
         raise AuthError({"success": False,
@@ -143,6 +145,8 @@ def restaurant_by_id(rest_id):
 
 
 @app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
+@cross_origin()
+@requires_auth
 def restaurant_create():
     if not requires_scope('create:restaurants'):
         raise AuthError({"success": False,
@@ -188,6 +192,8 @@ def restaurant_create():
 
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
+@cross_origin()
+@requires_auth
 def restaurant_update(rest_id):
     if not requires_scope('update:restaurants'):
         raise AuthError({"success": False,
@@ -240,6 +246,8 @@ def restaurant_update(rest_id):
 
 
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['DELETE'])
+@cross_origin()
+@requires_auth
 def restaurant_delete(rest_id):
     if not requires_scope('delete:restaurants'):
         raise AuthError({"success": False,
