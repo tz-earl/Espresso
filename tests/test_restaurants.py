@@ -139,6 +139,13 @@ class RestaurantsTestCases(unittest.TestCase):
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
 
+    def test_get_restaurant_unauthorized(self):
+        """Test get request that lacks authorization header"""
+        resp = self.test_client.get(self.API_V1_BASE,headers={})
+        self.assertEqual(resp.status_code, 401)
+        resp_dict = json.loads(resp.data)
+        self.assertEqual(resp_dict['success'], False)
+
     def test_create_restaurant_with_name_only(self):
         """Test creation of a restaurant with only the name field"""
         headers = {'Content-Type': 'application/json'}
@@ -201,6 +208,14 @@ class RestaurantsTestCases(unittest.TestCase):
         resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
 
+    def test_create_restaurant_unauthorized(self):
+        """Test post request that lacks authorization header"""
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': 'Restaurant Pho 2000'}
+        resp = self.test_client.post(self.API_V1_BASE + '/create', headers=headers, data=json.dumps(info))
+
+        self.assertEqual(resp.status_code, 401)
+
     def test_update_restaurant(self):
         """Test update of an existing restaurant's website and email address"""
         from espresso import db
@@ -245,6 +260,20 @@ class RestaurantsTestCases(unittest.TestCase):
         resp = self.test_client.put(self.API_V1_BASE + '/1', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
 
+    def test_update_restaurant_unauthorized(self):
+        """Test put request that lacks authorization header"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name = 'Restaurant Pho 2000'
+        db.session.add(Restaurant(name=name))
+        db.session.commit()
+
+        headers = {'Content-Type': 'application/json'}
+        info = {'name': 'Php 2048'}
+        resp = self.test_client.put(self.API_V1_BASE + '/1', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 401)
+
     def test_delete_restaurant(self):
         """Test deleting a specific restaurant by its id number"""
         from espresso import db
@@ -270,3 +299,16 @@ class RestaurantsTestCases(unittest.TestCase):
         # Since this is a freshly created table, there are no restaurants
         resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
+
+    def test_delete_restaurant_unauthorized(self):
+        """Test delete request that lacks authorization header"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Pandemic Plaza'
+        db.session.add(Restaurant(name=name_1))
+        db.session.commit()
+
+        # Since this is a freshly created table, the first id should be 1
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers={})
+        self.assertEqual(resp.status_code, 401)
