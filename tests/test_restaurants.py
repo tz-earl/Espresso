@@ -123,26 +123,17 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_get_restaurant_by_id_not_number(self):
         """Test getting a restaurant by a non-integer id number"""
-        from espresso import db
-        from espresso import Restaurant
-
         resp = self.test_client.get(self.API_V1_BASE + '/hello', headers=auth_header)
         self.assertEqual(resp.status_code, 400)
 
     def test_get_restaurant_404_not_found(self):
         """Test getting a restaurant with a non-existent subpath"""
-        from espresso import db
-        from espresso import Restaurant
-
         headers = {'authorization': 'Bearer ' + access_token}
         resp = self.test_client.get(self.API_V1_BASE + '/1/hello', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
 
     def test_get_restaurant_405_method_not_allowed(self):
         """Test using POST method that is not allowed"""
-        from espresso import db
-        from espresso import Restaurant
-
         resp = self.test_client.post(self.API_V1_BASE,headers=auth_header)
         self.assertEqual(resp.status_code, 405)
         resp_dict = json.loads(resp.data)
@@ -150,9 +141,6 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_create_restaurant_with_name_only(self):
         """Test creation of a restaurant with only the name field"""
-        from espresso import db
-        from espresso import Restaurant
-
         headers = {'Content-Type': 'application/json'}
         headers.update(auth_header)
         name = 'Restaurant Chinois'
@@ -165,9 +153,6 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_create_restaurant_with_all_fields(self):
         """Test creation of a restaurant with fields provided"""
-        from espresso import db
-        from espresso import Restaurant
-
         headers = {'Content-Type': 'application/json'}
         headers.update(auth_header)
         name = 'Restaurant Chinois'
@@ -210,9 +195,6 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_create_restaurant_no_name(self):
         """Test creation of a restaurant with only the name field"""
-        from espresso import db
-        from espresso import Restaurant
-
         headers = {'Content-Type': 'application/json'}
         headers.update(auth_header)
         info = {'city': 'Chicago'}
@@ -285,9 +267,6 @@ class RestaurantsTestCases(unittest.TestCase):
 
     def test_delete_restaurant_by_id_none(self):
         """Test deleting a restaurant by a non-existent id number"""
-        from espresso import db
-        from espresso import Restaurant
-
         # Since this is a freshly created table, there are no restaurants
         resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header)
         self.assertEqual(resp.status_code, 404)
