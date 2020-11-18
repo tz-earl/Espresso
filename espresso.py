@@ -9,7 +9,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 from sqlalchemy import exc as sqlalchemy_exc
 from werkzeug import exceptions as werkzeug_exc
@@ -52,9 +52,11 @@ class Restaurant(db.Model):
 RESTAURANTS_API_V1_BASE = '/api/v1/restaurants'
 API_VERSION = '1.0'
 
+
 @app.route('/', methods=['GET'])
 def index():
     return 'Hello from espresso'
+
 
 def restaurant_to_dict(rest):
     """Convert a Restaurant object to a dictionary"""
@@ -64,6 +66,7 @@ def restaurant_to_dict(rest):
                  'date_established': rest.date_established
                  }
     return rest_item
+
 
 def retrieve_restaurant(rest_id):
     """Given a restaurant id, retrieve it from the model/database"""
@@ -93,8 +96,15 @@ def retrieve_restaurant(rest_id):
 
     return (rest, ret_val, http_status)
 
+
 @app.route(RESTAURANTS_API_V1_BASE, methods=['GET'])
+@cross_origin()
+@requires_auth
 def restaurants():
+    if not requires_scope('read:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     try:
         restaurants = Restaurant.query.filter_by().order_by(Restaurant.id)
         rest_list = []
@@ -114,8 +124,15 @@ def restaurants():
     ret_val = {'success': True, 'restaurants': rest_list, 'message': None, 'api_version': API_VERSION}
     return jsonify(ret_val), 200
 
+
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
+@cross_origin()
+@requires_auth
 def restaurant_by_id(rest_id):
+    if not requires_scope('read:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
@@ -126,14 +143,21 @@ def restaurant_by_id(rest_id):
               }
     return jsonify(ret_val), 200
 
+
 @app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
+@cross_origin()
+@requires_auth
 def restaurant_create():
+    if not requires_scope('create:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     json_dict = None
     try:
         json_dict = request.json
     except werkzeug_exc.BadRequest as ex:
-        logging.warning('Could not decode the json content')
-        logging.warning(str(ex))
+        logging.error('Could not decode the json content')
+        logging.error(str(ex))
         ret_val = {'success': False, 'id': None, 'message': str(ex), 'api_version': API_VERSION}
         return jsonify(ret_val), 400
 
@@ -166,8 +190,15 @@ def restaurant_create():
                }
     return jsonify(ret_val), 200
 
+
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
+@cross_origin()
+@requires_auth
 def restaurant_update(rest_id):
+    if not requires_scope('update:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
@@ -176,8 +207,8 @@ def restaurant_update(rest_id):
     try:
         json_dict = request.json
     except werkzeug_exc.BadRequest as ex:
-        logging.warning('Could not decode the json content')
-        logging.warning(str(ex))
+        logging.error('Could not decode the json content')
+        logging.error(str(ex))
         ret_val = {'success': False, 'id': rest.id, 'restaurant': None, 'message': str(ex),
                    'api_version': API_VERSION
                   }
@@ -213,8 +244,15 @@ def restaurant_update(rest_id):
                }
     return jsonify(ret_val), 200
 
+
 @app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['DELETE'])
+@cross_origin()
+@requires_auth
 def restaurant_delete(rest_id):
+    if not requires_scope('delete:restaurants'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
     rest, ret_val, http_status = retrieve_restaurant(rest_id)
     if ret_val:  # Something went awry
         return jsonify(ret_val), http_status
@@ -226,33 +264,43 @@ def restaurant_delete(rest_id):
                'id': rest_id,
                'restaurant': None,
                'message': f'Restaurant deleted: {rest.name}',
+
                'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
 
 @app.errorhandler(400)
 def bad_request(error):
-    logging.warning(error)
+    logging.error(error)
     ret_val = {'success': False,
                'message': str(error)
                }
     return jsonify(ret_val), 400
 
+
 @app.errorhandler(404)
 def not_found(error):
-    logging.warning(error)
+    logging.error(error)
     ret_val = {'success': False,
                'message': 'Resource was not found, check the url',
                }
     return jsonify(ret_val), 404
 
+
 @app.errorhandler(405)
 def method_not_allowed(error):
-    logging.warning(error)
+    logging.error(error)
     ret_val = {'success': False,
                'message': 'Method not allowed for the requested URL',
                }
     return jsonify(ret_val), 405
+
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
 
 #----------------------------------------------------------------------------#
 # Launch.

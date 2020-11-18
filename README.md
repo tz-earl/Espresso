@@ -5,8 +5,10 @@ a small web app from scratch. The app will be like a simple version
 of Yelp that collects and displays user reviews of places that serve espresso.
 
 Initially, this project will consist of a backend implemented in Flask,
-SQLAlchemy, and PostgreSQL to support an API. The frontend will be a web client
-using asynchronous calls to the API.
+SQLAlchemy, and PostgreSQL to support an API. 
+
+The frontend will be a web client using asynchronous calls to the API,
+or it may be a native smartphone app such as for Android phones.
 
 To run the app using flask on the command line,
 
@@ -63,6 +65,14 @@ environment where the app is run, or some combination of the two.
 
 The syntax is the same for both, e.g.
 `ESPRESSO_DB_USER=earl`
+
+With the added use of Auth0 for required authorization to access the API backend,
+testing needs two additional environment variables to be set. Their values are
+available in the Auth0 dashboard under the _Espresso Reviews API (Test Application)_
+application.
+
+`AUTHO_CLIENT_ID="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
+`AUTHO_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
 
 Here some examples of how to run the tests.
 
