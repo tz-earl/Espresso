@@ -16,6 +16,10 @@ from get_auth0_token import AUTH0_CRU_RESTAURANTS_SCOPE
 access_token_cru_restaurants = get_auth0_access_token(AUTH0_PASSWORD_GRANT, AUTH0_CRU_RESTAURANTS_SCOPE)
 auth_header_cru_restaurants = {'authorization': 'Bearer ' + access_token_cru_restaurants}
 
+# The following access token includes all four crud permissions, especially including delete.
+access_token_del_restaurants = get_auth0_access_token(AUTH0_CLIENT_CRED_GRANT)
+auth_header_del_restaurants = {'authorization': 'Bearer ' + access_token_del_restaurants}
+
 
 def set_environment_vars():
     """Set the env vars to have values for testing,
@@ -286,12 +290,12 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header_cru_restaurants)
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header_del_restaurants)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], True)
 
-        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header_cru_restaurants)
+        resp = self.test_client.get(self.API_V1_BASE + '/1', headers=auth_header_del_restaurants)
         self.assertEqual(resp.status_code, 404)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -299,7 +303,7 @@ class RestaurantsTestCases(unittest.TestCase):
     def test_delete_restaurant_by_id_none(self):
         """Test deleting a restaurant by a non-existent id number"""
         # Since this is a freshly created table, there are no restaurants
-        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header_cru_restaurants)
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header_del_restaurants)
         self.assertEqual(resp.status_code, 404)
 
     def test_delete_restaurant_unauthorized(self):
@@ -314,3 +318,16 @@ class RestaurantsTestCases(unittest.TestCase):
         # Since this is a freshly created table, the first id should be 1
         resp = self.test_client.delete(self.API_V1_BASE + '/1', headers={})
         self.assertEqual(resp.status_code, 401)
+
+    def test_delete_restaurant_forbidden(self):
+        """Test delete request for user who lacks authorization to delete"""
+        from espresso import db
+        from espresso import Restaurant
+
+        name_1 = 'Restaurant Pandemic Plaza'
+        db.session.add(Restaurant(name=name_1))
+        db.session.commit()
+
+        # Since this is a freshly created table, the first id should be 1
+        resp = self.test_client.delete(self.API_V1_BASE + '/1', headers=auth_header_cru_restaurants)
+        self.assertEqual(resp.status_code, 403)
