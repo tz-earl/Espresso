@@ -11,15 +11,35 @@ if ENV_FILE:
 AUTHO_CLIENT_ID = os.environ['AUTHO_CLIENT_ID']
 AUTHO_CLIENT_SECRET = os.environ['AUTHO_CLIENT_SECRET']
 
+AUTH0_BARISTA_TEST_USER_NAME = os.environ['AUTH0_BARISTA_TEST_USER_NAME']
+AUTH0_BARISTA_TEST_USER_PASSWORD = os.environ['AUTH0_BARISTA_TEST_USER_PASSWORD']
 
-def get_auth0_access_token():
+AUTH0_PASSWORD_GRANT = 'password'
+AUTH0_CLIENT_CRED_GRANT = 'client_credentials'
+AUTH0_CRU_RESTAURANTS_SCOPE = "read:restaurants create:restaurants update:restaurants"
+
+
+def get_auth0_access_token(grant_type, scope=None):
+    """Retrieves an access token using the Auth0 Client Credentials Flow
+    which is documented at https://auth0.com/docs/flows/client-credentials-flow
+    and at https://auth0.com/docs/api/authentication#client-credentials-flow
+    """
     conn = http.client.HTTPSConnection("espresso-dev.us.auth0.com")
 
     request_items = { "client_id": AUTHO_CLIENT_ID, \
                       "client_secret": AUTHO_CLIENT_SECRET, \
                       "audience": "api.espresso.routinew.com", \
-                      "grant_type": "client_credentials"
-                    }
+                      "grant_type": grant_type
+                     }
+    if grant_type == AUTH0_PASSWORD_GRANT:
+        request_items.update({ "username": AUTH0_BARISTA_TEST_USER_NAME, \
+                               "password": AUTH0_BARISTA_TEST_USER_PASSWORD, \
+                               "scope": scope
+                             })
+    elif grant_type == AUTH0_CLIENT_CRED_GRANT:
+        pass  # Nothing else to add to the request
+    else:
+        assert(False, "Invalid grant type passed as parameter")
 
     payload = json.dumps(request_items)
     headers = {'content-type': "application/json"}
