@@ -44,13 +44,14 @@ class Restaurant(db.Model):
     website = db.Column(db.String)
     email = db.Column(db.String)
     date_established = db.Column(db.String)
+    creator = db.Column(db.String, nullable=True)  # nullable will later be set to False
 
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
 
-RESTAURANTS_API_V1_BASE = '/api/v1/restaurants'
-API_VERSION = '1.0'
+RESTAURANTS_API_BASE = '/api/v2/restaurants'
+API_VERSION = '2.0'
 
 
 @app.route('/', methods=['GET'])
@@ -63,7 +64,7 @@ def restaurant_to_dict(rest):
     rest_item = {'id': rest.id, 'name': rest.name, 'street': rest.street, 'suite': rest.suite,
                  'city': rest.city, 'state': rest.state, 'zip_code': rest.zip_code,
                  'phone_num': rest.phone_num, 'website': rest.website, 'email': rest.email,
-                 'date_established': rest.date_established
+                 'date_established': rest.date_established, 'creator': rest.creator
                  }
     return rest_item
 
@@ -97,7 +98,7 @@ def retrieve_restaurant(rest_id):
     return (rest, ret_val, http_status)
 
 
-@app.route(RESTAURANTS_API_V1_BASE, methods=['GET'])
+@app.route(RESTAURANTS_API_BASE, methods=['GET'])
 @cross_origin()
 @requires_auth
 def restaurants():
@@ -125,7 +126,7 @@ def restaurants():
     return jsonify(ret_val), 200
 
 
-@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['GET'])
+@app.route(RESTAURANTS_API_BASE + '/<rest_id>', methods=['GET'])
 @cross_origin()
 @requires_auth
 def restaurant_by_id(rest_id):
@@ -144,7 +145,7 @@ def restaurant_by_id(rest_id):
     return jsonify(ret_val), 200
 
 
-@app.route(RESTAURANTS_API_V1_BASE + '/create', methods=['POST'])
+@app.route(RESTAURANTS_API_BASE + '/create', methods=['POST'])
 @cross_origin()
 @requires_auth
 def restaurant_create():
@@ -180,6 +181,9 @@ def restaurant_create():
     rest.email = json_dict.get('email', None)
     rest.date_established = json_dict.get('date_established', None)
 
+    rest.creator = json_dict.get('creator', None)
+    # TO-DO.  Enforce that creator field is required and non-empty.
+
     db.session.add(rest)
     db.session.commit()
 
@@ -191,7 +195,7 @@ def restaurant_create():
     return jsonify(ret_val), 200
 
 
-@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['PUT'])
+@app.route(RESTAURANTS_API_BASE + '/<rest_id>', methods=['PUT'])
 @cross_origin()
 @requires_auth
 def restaurant_update(rest_id):
@@ -245,7 +249,7 @@ def restaurant_update(rest_id):
     return jsonify(ret_val), 200
 
 
-@app.route(RESTAURANTS_API_V1_BASE + '/<rest_id>', methods=['DELETE'])
+@app.route(RESTAURANTS_API_BASE + '/<rest_id>', methods=['DELETE'])
 @cross_origin()
 @requires_auth
 def restaurant_delete(rest_id):
