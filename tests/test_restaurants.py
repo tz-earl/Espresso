@@ -153,12 +153,12 @@ class RestaurantsTestCases(unittest.TestCase):
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
 
-    def test_create_restaurant_with_name_only(self):
-        """Test creation of a restaurant with only the name field"""
+    def test_create_restaurant_with_name_creator_only(self):
+        """Test creation of a restaurant with only the name and creator fields"""
         headers = {'Content-Type': 'application/json'}
         headers.update(auth_header_cru_restaurants)
         name = 'Restaurant Chinois'
-        info = {'name': name}
+        info = {'name': name, 'creator': 'nobody@gmail.com'}
         resp = self.test_client.post(self.API_BASE + '/create', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 200)
@@ -211,10 +211,18 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp_dict['restaurant']['creator'], creator)
 
     def test_create_restaurant_no_name(self):
-        """Test creation of a restaurant with only the name field"""
+        """Test creation of a restaurant with missing name field"""
         headers = {'Content-Type': 'application/json'}
         headers.update(auth_header_cru_restaurants)
-        info = {'city': 'Chicago'}
+        info = {'creator': 'nobody@gmail.com', 'city': 'Chicago'}
+        resp = self.test_client.post(self.API_BASE + '/create', headers=headers, data=json.dumps(info))
+        self.assertEqual(resp.status_code, 400)
+
+    def test_create_restaurant_no_creator(self):
+        """Test creation of a restaurant with missing creator field"""
+        headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header_cru_restaurants)
+        info = {'name': 'Ping Yan', 'city': 'Chicago'}
         resp = self.test_client.post(self.API_BASE + '/create', headers=headers, data=json.dumps(info))
         self.assertEqual(resp.status_code, 400)
 
