@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from dotenv import load_dotenv, find_dotenv
 
 import unittest
@@ -163,7 +162,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
-        self.assertNotEqual(re.search(name, resp_dict['message']), None)
+        self.assertEqual(name in resp_dict['message'], True)
 
     def test_create_restaurant_with_all_fields(self):
         """Test creation of a restaurant with fields provided"""
@@ -190,7 +189,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['id'], 1)
-        self.assertNotEqual(re.search(name, resp_dict['message']), None)
+        self.assertEqual(name in resp_dict['message'], True)
 
         # Retrieve the restaurant and assert that all fields are as created
         resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
@@ -253,7 +252,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['id'], 1)
-        self.assertNotEqual(re.search(name, resp_dict['message']), None)
+        self.assertEqual(name in resp_dict['message'], True)
 
         resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
 
