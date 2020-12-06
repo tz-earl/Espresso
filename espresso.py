@@ -44,7 +44,7 @@ class Restaurant(db.Model):
     website = db.Column(db.String)
     email = db.Column(db.String)
     date_established = db.Column(db.String)
-    creator = db.Column(db.String, nullable=True)  # nullable will later be set to False
+    creator = db.Column(db.String, nullable=False)
 
 #----------------------------------------------------------------------------#
 # Controllers.
