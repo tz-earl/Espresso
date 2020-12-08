@@ -44,7 +44,7 @@ class Restaurant(db.Model):
     website = db.Column(db.String)
     email = db.Column(db.String)
     date_established = db.Column(db.String)
-    creator = db.Column(db.String, nullable=True)  # nullable will later be set to False
+    creator = db.Column(db.String, nullable=False)
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -169,7 +169,14 @@ def restaurant_create():
                   }
         return jsonify(ret_val), 400
 
-    rest = Restaurant(name=name)
+    creator = json_dict.get('creator', None)  # creator is required, validate this
+    if not creator:
+        ret_val = {'success': False, 'id': None, 'message': f'Creator of restaurant is required',
+                   'api_version': API_VERSION
+                  }
+        return jsonify(ret_val), 400
+
+    rest = Restaurant(name=name, creator=creator)
 
     rest.street = json_dict.get('street', None)
     rest.suite = json_dict.get('suite', None)
@@ -180,9 +187,6 @@ def restaurant_create():
     rest.website = json_dict.get('website', None)
     rest.email = json_dict.get('email', None)
     rest.date_established = json_dict.get('date_established', None)
-
-    rest.creator = json_dict.get('creator', None)
-    # TO-DO.  Enforce that creator field is required and non-empty.
 
     db.session.add(rest)
     db.session.commit()
