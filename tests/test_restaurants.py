@@ -86,9 +86,9 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Italiano'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         name_2 = 'Restaurant Français'
-        db.session.add(Restaurant(name=name_2))
+        db.session.add(Restaurant(name=name_2, creator='test-user@gmail.com'))
         db.session.commit()
 
         resp = self.test_client.get(self.API_BASE, headers=auth_header_cru_restaurants)
@@ -104,7 +104,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
@@ -119,7 +119,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the only id should be 1.
@@ -228,7 +228,7 @@ class RestaurantsTestCases(unittest.TestCase):
     def test_create_restaurant_unauthorized(self):
         """Test post request that lacks authorization header"""
         headers = {'Content-Type': 'application/json'}
-        info = {'name': 'Restaurant Pho 2000'}
+        info = {'name': 'Restaurant Pho 2000', 'creator': 'test-user@gmail.com'}
         resp = self.test_client.post(self.API_BASE + '/create', headers=headers, data=json.dumps(info))
 
         self.assertEqual(resp.status_code, 401)
@@ -239,7 +239,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name = 'Restaurant Mexicano'
-        db.session.add(Restaurant(name=name))
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
@@ -268,7 +268,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name = 'Restaurant Mexicano'
-        db.session.add(Restaurant(name=name))
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
@@ -283,7 +283,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name = 'Restaurant Pho 2000'
-        db.session.add(Restaurant(name=name))
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
@@ -297,7 +297,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
@@ -323,7 +323,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Pandemic Plaza'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
@@ -336,7 +336,7 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import Restaurant
 
         name_1 = 'Restaurant Pandemic Plaza'
-        db.session.add(Restaurant(name=name_1))
+        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
