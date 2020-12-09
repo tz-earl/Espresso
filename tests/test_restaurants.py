@@ -103,23 +103,23 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
+        name = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
         resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
-        self.assertEqual(resp_dict['restaurant']['name'], name_1)
+        self.assertEqual(resp_dict['restaurant']['name'], name)
 
     def test_get_restaurant_by_id_none(self):
         """Test getting a restaurant by a non-existent id number"""
         from espresso import db
         from espresso import Restaurant
 
-        name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
+        name = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the only id should be 1.
@@ -296,8 +296,8 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        name_1 = 'Restaurant Greco'
-        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
+        name = 'Restaurant Greco'
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
@@ -322,8 +322,8 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        name_1 = 'Restaurant Pandemic Plaza'
-        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
+        name = 'Restaurant Pandemic Plaza'
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
@@ -335,8 +335,8 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import db
         from espresso import Restaurant
 
-        name_1 = 'Restaurant Pandemic Plaza'
-        db.session.add(Restaurant(name=name_1, creator='test-user@gmail.com'))
+        name = 'Restaurant Pandemic Plaza'
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
