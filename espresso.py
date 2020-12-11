@@ -98,6 +98,17 @@ def retrieve_restaurant(rest_id):
     return (rest, ret_val, http_status)
 
 
+DEFAULT_MAX_STRING_LENGTH = 255
+
+def get_dict_value_trunc(some_dict, which_prop, default=None, max_length=DEFAULT_MAX_STRING_LENGTH):
+    """Get a key value from a dict and truncate its length if too long"""
+    prop_value = some_dict.get(which_prop, default)
+    if isinstance(prop_value, str):
+        return prop_value[:max_length]
+    else:
+        return prop_value
+
+
 @app.route(RESTAURANTS_API_BASE, methods=['GET'])
 @cross_origin()
 @requires_auth
@@ -162,14 +173,14 @@ def restaurant_create():
         ret_val = {'success': False, 'id': None, 'message': str(ex), 'api_version': API_VERSION}
         return jsonify(ret_val), 400
 
-    name = json_dict.get('name', None)  # name is required, validate this
+    name = get_dict_value_trunc(json_dict, 'name')  # name is required, validate this
     if not name:
         ret_val = {'success': False, 'id': None, 'message': f'Name of restaurant is required',
                    'api_version': API_VERSION
                   }
         return jsonify(ret_val), 400
 
-    creator = json_dict.get('creator', None)  # creator is required, validate this
+    creator = get_dict_value_trunc(json_dict, 'creator')  # creator is required, validate this
     if not creator:
         ret_val = {'success': False, 'id': None, 'message': f'Creator of restaurant is required',
                    'api_version': API_VERSION
@@ -178,15 +189,15 @@ def restaurant_create():
 
     rest = Restaurant(name=name, creator=creator)
 
-    rest.street = json_dict.get('street', None)
-    rest.suite = json_dict.get('suite', None)
-    rest.city = json_dict.get('city', None)
-    rest.state = json_dict.get('state', None)
-    rest.zip_code = json_dict.get('zip_code', None)
-    rest.phone_num = json_dict.get('phone_num', None)
-    rest.website = json_dict.get('website', None)
-    rest.email = json_dict.get('email', None)
-    rest.date_established = json_dict.get('date_established', None)
+    rest.street = get_dict_value_trunc(json_dict, 'street')
+    rest.suite = get_dict_value_trunc(json_dict, 'suite')
+    rest.city = get_dict_value_trunc(json_dict, 'city')
+    rest.state = get_dict_value_trunc(json_dict, 'state')
+    rest.zip_code = get_dict_value_trunc(json_dict, 'zip_code')
+    rest.phone_num = get_dict_value_trunc(json_dict, 'phone_num')
+    rest.website = get_dict_value_trunc(json_dict, 'website')
+    rest.email = get_dict_value_trunc(json_dict, 'email')
+    rest.date_established = get_dict_value_trunc(json_dict, 'date_established')
 
     db.session.add(rest)
     db.session.commit()
@@ -222,16 +233,16 @@ def restaurant_update(rest_id):
                   }
         return jsonify(ret_val), 400
 
-    rest.name = json_dict.get('name', rest.name)
-    rest.street = json_dict.get('street', rest.street)
-    rest.suite = json_dict.get('suite', rest.suite)
-    rest.city = json_dict.get('city', rest.city)
-    rest.state = json_dict.get('state', rest.state)
-    rest.zip_code = json_dict.get('zip_code', rest.zip_code)
-    rest.phone_num = json_dict.get('phone_num', rest.phone_num)
-    rest.website = json_dict.get('website', rest.website)
-    rest.email = json_dict.get('email', rest.email)
-    rest.date_established = json_dict.get('date_established', rest.date_established)
+    rest.name = get_dict_value_trunc(json_dict, 'name', rest.name)
+    rest.street = get_dict_value_trunc(json_dict, 'street', rest.street)
+    rest.suite = get_dict_value_trunc(json_dict, 'suite', rest.suite)
+    rest.city = get_dict_value_trunc(json_dict, 'city', rest.city)
+    rest.state = get_dict_value_trunc(json_dict, 'state', rest.state)
+    rest.zip_code = get_dict_value_trunc(json_dict, 'zip_code', rest.zip_code)
+    rest.phone_num = get_dict_value_trunc(json_dict, 'phone_num', rest.phone_num)
+    rest.website = get_dict_value_trunc(json_dict, 'website', rest.website)
+    rest.email = get_dict_value_trunc(json_dict, 'email', rest.email)
+    rest.date_established = get_dict_value_trunc(json_dict, 'date_established', rest.date_established)
 
     # Restaurant name may not be blank
     if not rest.name:

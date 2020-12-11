@@ -58,12 +58,14 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import app
         from espresso import db
         from espresso import RESTAURANTS_API_BASE
+        from espresso import DEFAULT_MAX_STRING_LENGTH
 
         self.app = app
         self.test_client = app.test_client()
         # DEBUGGING: print(f"Using database uri: {self.app.config['SQLALCHEMY_DATABASE_URI']}")
 
         self.API_BASE = RESTAURANTS_API_BASE
+        self.DEFAULT_MAX_STRING = DEFAULT_MAX_STRING_LENGTH
 
         db.drop_all()
         db.create_all()
@@ -233,13 +235,27 @@ class RestaurantsTestCases(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 401)
 
+    def test_create_restaurant_field_too_long(self):
+        """Test that a string field value that is too long is truncated"""
+        headers = {'Content-Type': 'application/json'}
+        headers.update(auth_header_cru_restaurants)
+        name = 'Restaurant Chinois' + ('z' * self.DEFAULT_MAX_STRING)  # Make the name too long
+        info = {'name': name, 'creator': 'nobody@gmail.com'}
+        resp = self.test_client.post(self.API_BASE + '/create', headers=headers, data=json.dumps(info))
+
+        self.assertEqual(resp.status_code, 200)
+        resp_dict = json.loads(resp.data)
+        # The too-long name should not be in the message
+        self.assertEqual(name in resp_dict['message'], False)
+
     def test_update_restaurant(self):
         """Test update of an existing restaurant's website and email address"""
         from espresso import db
         from espresso import Restaurant
 
         name = 'Restaurant Mexicano'
-        db.session.add(Restaurant(name=name, creator='test-user@gmail.com'))
+        zip_code = "94110"
+        db.session.add(Restaurant(name=name, creator='test-user@gmail.com', zip_code=zip_code))
         db.session.commit()
 
         headers = {'Content-Type': 'application/json'}
@@ -261,6 +277,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp_dict['restaurant']['id'], 1)
         self.assertEqual(resp_dict['restaurant']['website'], website)
         self.assertEqual(resp_dict['restaurant']['email'], email)
+        self.assertEqual(resp_dict['restaurant']['zip_code'], zip_code) # Make sure this has not changed
 
     def test_update_restaurant_blank_name(self):
         """Test update of a restaurant with the name field an empty string"""
