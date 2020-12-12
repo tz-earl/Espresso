@@ -1,5 +1,15 @@
 -- To run these sql statements from within psql, use \i restaurant-starter-rows.sql
 
+-- This script resets the contents the restaurant table without having to
+-- drop the table itself.
+
+-- Delete all existing rows from the restaurant table
+delete from restaurant;
+
+-- Reset the id sequence to start at 1
+alter sequence restaurant_id_seq restart with 1;
+
+-- Insert five rows
 insert into restaurant
     (name, street, suite, city, state, zip_code, phone_num, website, email, date_established, creator)
     values ('Herbal', '448 Larkin St', null, 'San Francisco', 'CA', '94102', '(415) 896-4839',
