@@ -58,14 +58,14 @@ class RestaurantsTestCases(unittest.TestCase):
         from espresso import app
         from espresso import db
         from espresso import RESTAURANTS_API_BASE
-        from espresso import DEFAULT_MAX_STRING_LENGTH
+        from espresso import DEF_MAX_STR_LEN
 
         self.app = app
         self.test_client = app.test_client()
         # DEBUGGING: print(f"Using database uri: {self.app.config['SQLALCHEMY_DATABASE_URI']}")
 
         self.API_BASE = RESTAURANTS_API_BASE
-        self.DEFAULT_MAX_STRING = DEFAULT_MAX_STRING_LENGTH
+        self.DEFAULT_MAX_STRING = DEF_MAX_STR_LEN
 
         db.drop_all()
         db.create_all()

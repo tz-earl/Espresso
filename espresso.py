@@ -29,22 +29,24 @@ migrate = Migrate(app, db)
 # of what might be allowed as far as the origins of requestors.
 CORS(app, supports_credentials=True, origins=['http://127.0.0.1:*', 'http://localhost:*'])
 
+DEF_MAX_STR_LEN = 255 # The default max string length
+
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    street = db.Column(db.String)
-    suite = db.Column(db.String)
-    city = db.Column(db.String)
-    state = db.Column(db.String)
-    zip_code = db.Column(db.String)
-    phone_num = db.Column(db.String)
-    website = db.Column(db.String)
-    email = db.Column(db.String)
-    date_established = db.Column(db.String)
-    creator = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(DEF_MAX_STR_LEN), nullable=False)
+    street = db.Column(db.String(DEF_MAX_STR_LEN))
+    suite = db.Column(db.String(DEF_MAX_STR_LEN))
+    city = db.Column(db.String(DEF_MAX_STR_LEN))
+    state = db.Column(db.String(DEF_MAX_STR_LEN))
+    zip_code = db.Column(db.String(DEF_MAX_STR_LEN))
+    phone_num = db.Column(db.String(DEF_MAX_STR_LEN))
+    website = db.Column(db.String(DEF_MAX_STR_LEN))
+    email = db.Column(db.String(DEF_MAX_STR_LEN))
+    date_established = db.Column(db.String(DEF_MAX_STR_LEN))
+    creator = db.Column(db.String(DEF_MAX_STR_LEN), nullable=False)
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -97,10 +99,7 @@ def retrieve_restaurant(rest_id):
 
     return (rest, ret_val, http_status)
 
-
-DEFAULT_MAX_STRING_LENGTH = 255
-
-def get_dict_value_trunc(some_dict, which_prop, default=None, max_length=DEFAULT_MAX_STRING_LENGTH):
+def get_dict_value_trunc(some_dict, which_prop, default=None, max_length=DEF_MAX_STR_LEN):
     """Get a key value from a dict and truncate its length if too long"""
     prop_value = some_dict.get(which_prop, default)
     if isinstance(prop_value, str):
