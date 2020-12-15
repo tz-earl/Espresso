@@ -54,6 +54,16 @@ def get_auth0_access_token(grant_type, scope=None):
     return access_token
 
 
+# Get the Auth0 access token just once to avoid repeated hits to the Auth0 API
+# "cru" means permissions to create-read-update
+access_token_cru_restaurants = get_auth0_access_token(AUTH0_PASSWORD_GRANT, AUTH0_CRU_RESTAURANTS_SCOPE)
+auth_header_cru_restaurants = {'authorization': 'Bearer ' + access_token_cru_restaurants}
+
+# The following access token includes all four crud permissions, especially including delete.
+access_token_del_restaurants = get_auth0_access_token(AUTH0_CLIENT_CRED_GRANT)
+auth_header_del_restaurants = {'authorization': 'Bearer ' + access_token_del_restaurants}
+
+
 if __name__ == '__main__':
     access_token = get_auth0_access_token()
     print(access_token)
