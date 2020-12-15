@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 CORS(app, supports_credentials=True, origins=['http://127.0.0.1:*', 'http://localhost:*'])
 
 DEF_MAX_STR_LEN = 255 # The default max string length
-
+MAX_COMMENT_LEN = 1000 # Max length of comments in reviews
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
@@ -47,6 +47,19 @@ class Restaurant(db.Model):
     email = db.Column(db.String(DEF_MAX_STR_LEN))
     date_established = db.Column(db.String(DEF_MAX_STR_LEN))
     creator = db.Column(db.String(DEF_MAX_STR_LEN), nullable=False)
+
+    reviews = db.relationship('Review', backref='rest_reviewed', lazy=True, uselist=True)
+
+
+class Review(db.Model):
+    __tablename__ = 'review'
+
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String(DEF_MAX_STR_LEN))  # The author's name (aka author id) is from Auth0.
+    date = db.Column(db.Date)
+    rating = db.Column(db.SmallInteger)
+    comment = db.Column(db.String(MAX_COMMENT_LEN))
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
 #----------------------------------------------------------------------------#
 # Controllers.
