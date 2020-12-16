@@ -4,7 +4,7 @@ import unittest
 
 from set_environment_vars import set_environment_vars
 from get_auth0_token import auth_header_cru_restaurants
-from get_auth0_token import auth_header_del_restaurants
+from get_auth0_token import auth_header_all_permissions
 
 
 class RestaurantsTestCases(unittest.TestCase):
@@ -280,12 +280,12 @@ class RestaurantsTestCases(unittest.TestCase):
         db.session.commit()
 
         # Since this is a freshly created table, the first id should be 1
-        resp = self.test_client.delete(self.API_BASE + '/1', headers=auth_header_del_restaurants)
+        resp = self.test_client.delete(self.API_BASE + '/1', headers=auth_header_all_permissions)
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], True)
 
-        resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_del_restaurants)
+        resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_all_permissions)
         self.assertEqual(resp.status_code, 404)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['success'], False)
@@ -293,7 +293,7 @@ class RestaurantsTestCases(unittest.TestCase):
     def test_delete_restaurant_by_id_none(self):
         """Test deleting a restaurant by a non-existent id number"""
         # Since this is a freshly created table, there are no restaurants
-        resp = self.test_client.delete(self.API_BASE + '/1', headers=auth_header_del_restaurants)
+        resp = self.test_client.delete(self.API_BASE + '/1', headers=auth_header_all_permissions)
         self.assertEqual(resp.status_code, 404)
 
     def test_delete_restaurant_unauthorized(self):
