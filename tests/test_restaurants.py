@@ -321,3 +321,7 @@ class RestaurantsTestCases(unittest.TestCase):
         # Since this is a freshly created table, the first id should be 1
         resp = self.test_client.delete(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
         self.assertEqual(resp.status_code, 403)
+
+
+if __name__ == "__main__":
+    unittest.main()

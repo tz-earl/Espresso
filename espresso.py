@@ -66,6 +66,7 @@ class Review(db.Model):
 #----------------------------------------------------------------------------#
 
 RESTAURANTS_API_BASE = '/api/v2/restaurants'
+REVIEWS_API_BASE = '/api/v2/reviews'
 API_VERSION = '2.0'
 
 
@@ -299,6 +300,43 @@ def restaurant_delete(rest_id):
                'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
+
+
+def review_to_dict(rev):
+    """Convert a Review object to a dictionary"""
+    review_item = {'id': rev.id, 'author': rev.author, 'date': rev.date, 'rating': rev.rating,
+                   'comment': rev.comment, 'restaurant_id': rev.restaurant_id
+                  }
+    return review_item
+
+
+@app.route(REVIEWS_API_BASE, methods=['GET'])
+@cross_origin()
+@requires_auth
+def reviews():
+    if not requires_scope('read:reviews'):
+        raise AuthError({"success": False,
+                         "message": "No access to this resource"}, 403)
+
+    try:
+        reviews = Review.query.filter_by().order_by(Review.id)
+        reviews_list = []
+        for rev in reviews:
+            review_item = review_to_dict(rev)
+            reviews_list.append(review_item)
+    except Exception as ex:
+        logging.error('Failed to retrieve list of reviews for "/reviews" endpoint')
+        logging.error(f'Exception was thrown: {str(ex)}')
+        ret_val = {'success': False,
+            'reviews': None,
+            'message': 'Server failure: list of reviews could not be retrieved',
+            'api_version': API_VERSION
+            }
+        return jsonify(ret_val), 500
+
+    ret_val = {'success': True, 'reviews': reviews_list, 'message': None, 'api_version': API_VERSION}
+    return jsonify(ret_val), 200
+
 
 @app.errorhandler(400)
 def bad_request(error):
