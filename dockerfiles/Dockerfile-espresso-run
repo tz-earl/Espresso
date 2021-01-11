@@ -1,0 +1,14 @@
+# Use this dockerfile to build image espresso-run
+
+FROM espresso
+
+WORKDIR /espresso
+
+ENV FLASK_APP=espresso.py
+ENV FLASK_DEBUG=true
+ENV FLASK_ENV=development
+
+EXPOSE 5000
+
+ENTRYPOINT flask run --host 0.0.0.0 --port 5000
+

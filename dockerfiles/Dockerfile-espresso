@@ -1,0 +1,7 @@
+# Use this dockerfile to build image espresso
+
+FROM flask112
+
+WORKDIR /espresso
+COPY . /espresso
+

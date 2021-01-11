@@ -1,0 +1,13 @@
+.gitignore
+.idea
+venv
+__pycache__
+espresso.pgsql
+espresso.dbm
+response-access-token.json
+response-jwks.json
+.env
+auth0-token-verification.odt
+espresso-security-slides
+static
+

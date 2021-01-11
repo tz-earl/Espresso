@@ -1,0 +1,9 @@
+# Use this dockerfile to build images flask112
+
+FROM python3-pip3
+
+WORKDIR /espresso
+COPY requirements.txt .
+
+RUN pip3 install -r requirements.txt
+
