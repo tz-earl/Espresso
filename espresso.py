@@ -5,7 +5,7 @@
 import json
 import logging
 
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import jsonify
@@ -73,6 +73,11 @@ API_VERSION = '2.0'
 @app.route('/', methods=['GET'])
 def index():
     return 'Hello from espresso'
+
+
+@app.route('/favicon.ico', methods=['GET'])
+def favicon():
+    return send_from_directory(app.root_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 def restaurant_to_dict(rest):
