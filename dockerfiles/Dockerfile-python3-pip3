@@ -1,0 +1,8 @@
+# Use this dockerfile to build image python3-pip3
+
+FROM ubuntu:focal
+
+RUN apt-get update
+RUN apt-get --yes install python3
+RUN apt-get --yes install python3-pip
+
