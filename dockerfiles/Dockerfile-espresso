@@ -5,3 +5,9 @@ FROM flask112
 WORKDIR /espresso
 COPY . /espresso
 
+ENV FLASK_APP=espresso.py
+ENV FLASK_DEBUG=true
+ENV FLASK_ENV=development
+
+EXPOSE 5000
+
