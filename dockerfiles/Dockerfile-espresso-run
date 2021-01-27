@@ -4,5 +4,8 @@ FROM espresso
 
 WORKDIR /espresso
 
+RUN useradd -u 1000 earl
+USER earl
+
 ENTRYPOINT flask run --host 0.0.0.0 --port 5000
 
