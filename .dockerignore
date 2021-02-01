@@ -10,4 +10,10 @@ response-jwks.json
 auth0-token-verification.odt
 espresso-security-slides
 static
+.dockerignore
+.env.example
+.git
+dockerfiles
+espresso.png
+tests
 

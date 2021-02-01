@@ -4,11 +4,8 @@ FROM espresso
 
 WORKDIR /espresso
 
-ENV FLASK_APP=espresso.py
-ENV FLASK_DEBUG=true
-ENV FLASK_ENV=development
-
-EXPOSE 5000
+RUN useradd -u 1000 earl
+USER earl
 
 ENTRYPOINT flask run --host 0.0.0.0 --port 5000
 
