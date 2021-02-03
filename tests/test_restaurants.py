@@ -126,7 +126,7 @@ class RestaurantsTestCases(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
-        self.assertEqual(name in resp_dict['message'], True)
+        self.assertTrue(name in resp_dict['message'])
 
     def test_create_restaurant_with_all_fields(self):
         """Test creation of a restaurant with fields provided"""
@@ -153,9 +153,25 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['id'], 1)
-        self.assertEqual(name in resp_dict['message'], True)
+        self.assertTrue(name in resp_dict['message'])
 
-        # Retrieve the restaurant and assert that all fields are as created
+        # Check that all restaurant fields are returned.
+        self.assertTrue('restaurant' in resp_dict)
+        self.assertEqual(resp_dict['restaurant']['id'], 1)
+        self.assertEqual(resp_dict['restaurant']['name'], name)
+        self.assertEqual(resp_dict['restaurant']['street'], street)
+        self.assertEqual(resp_dict['restaurant']['suite'], suite)
+        self.assertEqual(resp_dict['restaurant']['city'], city)
+        self.assertEqual(resp_dict['restaurant']['state'], state)
+        self.assertEqual(resp_dict['restaurant']['zip_code'], zip_code)
+        self.assertEqual(resp_dict['restaurant']['phone_num'], phone_num)
+        self.assertEqual(resp_dict['restaurant']['website'], website)
+        self.assertEqual(resp_dict['restaurant']['email'], email)
+        self.assertEqual(resp_dict['restaurant']['date_established'], date_established)
+        self.assertEqual(resp_dict['restaurant']['creator'], creator)
+
+        # -----------------------------
+        # Make a separate request to retrieve the restaurant and assert that all fields are as created
         resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
 
         self.assertEqual(resp.status_code, 200)
@@ -208,7 +224,7 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         # The too-long name should not be in the message
-        self.assertEqual(name in resp_dict['message'], False)
+        self.assertFalse(name in resp_dict['message'])
 
     def test_update_restaurant(self):
         """Test update of an existing restaurant's website and email address"""
@@ -230,8 +246,26 @@ class RestaurantsTestCases(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         resp_dict = json.loads(resp.data)
         self.assertEqual(resp_dict['id'], 1)
-        self.assertEqual(name in resp_dict['message'], True)
+        self.assertTrue(name in resp_dict['message'])
 
+        # Check that all restaurant fields are returned.
+        self.assertTrue('restaurant' in resp_dict)
+        self.assertEqual(resp_dict['restaurant']['id'], 1)
+        self.assertEqual(resp_dict['restaurant']['website'], website)
+        self.assertEqual(resp_dict['restaurant']['email'], email)
+        self.assertEqual(resp_dict['restaurant']['zip_code'], zip_code)
+
+        self.assertTrue('name' in resp_dict['restaurant'])
+        self.assertTrue('street' in resp_dict['restaurant'])
+        self.assertTrue('suite' in resp_dict['restaurant'])
+        self.assertTrue('city' in resp_dict['restaurant'])
+        self.assertTrue('state' in resp_dict['restaurant'])
+        self.assertTrue('phone_num' in resp_dict['restaurant'])
+        self.assertTrue('date_established' in resp_dict['restaurant'])
+        self.assertTrue('creator' in resp_dict['restaurant'])
+
+        # -----------------------------
+        # Make a separate request to retrieve the restaurant and assert that updated fields are as intended
         resp = self.test_client.get(self.API_BASE + '/1', headers=auth_header_cru_restaurants)
 
         self.assertEqual(resp.status_code, 200)
