@@ -220,9 +220,11 @@ def restaurant_create():
     db.session.add(rest)
     db.session.commit()
 
+    rest_item = restaurant_to_dict(rest)
     ret_val = {'success': True,
                'id': rest.id,
                'message': f'Restaurant created with name: {rest.name}',
+               'restaurant': rest_item,
                'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
@@ -273,10 +275,14 @@ def restaurant_update(rest_id):
     db.session.add(rest)
     db.session.commit()
 
+    # Retrieve the entire restaurant from the database and return it
+    # in the response.
+    rest, ret_val, http_status = retrieve_restaurant(rest_id)
+    rest_item = restaurant_to_dict(rest)
     ret_val = {'success': True,
                'id': rest.id,
-               'restaurant': None,
                'message': f"Restaurant updated: {rest.name}",
+               'restaurant': rest_item,
                'api_version': API_VERSION
                }
     return jsonify(ret_val), 200
