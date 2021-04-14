@@ -8,8 +8,8 @@ ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
 
-AUTHO_CLIENT_ID = os.environ['AUTHO_CLIENT_ID']
-AUTHO_CLIENT_SECRET = os.environ['AUTHO_CLIENT_SECRET']
+AUTH0_CLIENT_ID = os.environ['AUTH0_CLIENT_ID']
+AUTH0_CLIENT_SECRET = os.environ['AUTH0_CLIENT_SECRET']
 
 AUTH0_BARISTA_TEST_USER_NAME = os.environ['AUTH0_BARISTA_TEST_USER_NAME']
 AUTH0_BARISTA_TEST_USER_PASSWORD = os.environ['AUTH0_BARISTA_TEST_USER_PASSWORD']
@@ -33,8 +33,8 @@ def get_auth0_access_token(grant_type, scope=None, user=None, passwd=None):
     """
     conn = http.client.HTTPSConnection("espresso-dev.us.auth0.com")
 
-    request_items = { "client_id": AUTHO_CLIENT_ID, \
-                      "client_secret": AUTHO_CLIENT_SECRET, \
+    request_items = { "client_id": AUTH0_CLIENT_ID, \
+                      "client_secret": AUTH0_CLIENT_SECRET, \
                       "audience": "api.espresso.routinew.com", \
                       "grant_type": grant_type
                      }

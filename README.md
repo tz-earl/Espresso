@@ -71,8 +71,8 @@ testing needs two additional environment variables to be set. Their values are
 available in the Auth0 dashboard under the _Espresso Reviews API (Test Application)_
 application.
 
-`AUTHO_CLIENT_ID="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
-`AUTHO_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
+`AUTH0_CLIENT_ID="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
+`AUTH0_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
 
 Here some examples of how to run the tests.
 
